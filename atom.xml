@@ -6,7 +6,7 @@
   <link href="https://woshiqianmo.github.io/atom.xml" rel="self"/>
   
   <link href="https://woshiqianmo.github.io/"/>
-  <updated>2021-04-18T09:54:56.202Z</updated>
+  <updated>2021-04-18T13:18:54.633Z</updated>
   <id>https://woshiqianmo.github.io/</id>
   
   <author>
@@ -15,6 +15,54 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>02-JVM基础</title>
+    <link href="https://woshiqianmo.github.io/2021/04/18/JVM/02-JVM%E5%9F%BA%E7%A1%80/"/>
+    <id>https://woshiqianmo.github.io/2021/04/18/JVM/02-JVM%E5%9F%BA%E7%A1%80/</id>
+    <published>2021-04-18T13:07:00.000Z</published>
+    <updated>2021-04-18T13:18:54.633Z</updated>
+    
+    <content type="html"><![CDATA[<h5 id="一、Class-Loading-Linking-Initlizing"><a href="#一、Class-Loading-Linking-Initlizing" class="headerlink" title="一、Class Loading Linking Initlizing"></a>一、Class Loading Linking Initlizing</h5><p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1618751341263.png" alt="class cycle"></p><h5 id="二、ClassLorder-类加载器"><a href="#二、ClassLorder-类加载器" class="headerlink" title="二、ClassLorder 类加载器"></a>二、ClassLorder 类加载器</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">//获取具体哪个ClassLoader 类 </span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ClassLoaderLevel</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        System.out.println(String.class.getClassLoader());<span class="hljs-comment">//null 被Bootstrap加载</span><br>        System.out.println(sun.awt.HKSCS.class.getClassLoader());   <span class="hljs-comment">//null 被Bootstrap加载</span><br>   System.out.println(sun.net.spi.nameservice.dns.DNSNameService.class.getClassLoader());<br>        <span class="hljs-comment">//被 sun.misc.Launcher$ExtClassLoader 加载</span><br>        System.out.println(T002_ClassLoaderLevel.class.getClassLoader()); <span class="hljs-comment">//被sun.misc.Launcher$AppClassLoader 加载</span><br>     System.out.println(sun.net.spi.nameservice.dns.DNSNameService.class.getClassLoader().getClass().getClassLoader());<br>        System.out.println(T002_ClassLoaderLevel.class.getClassLoader().getClass().getClassLoader());<br><br>        System.out.println(<span class="hljs-keyword">new</span> T006_MSBClassLoader().getParent());<br>        System.out.println(ClassLoader.getSystemClassLoader());<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure><p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1618751798107.png" alt="类加载器"></p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h5 id=&quot;一、Class-Loading-Linking-Initlizing&quot;&gt;&lt;a href=&quot;#一、Class-Loading-Linking-Initlizing&quot; class=&quot;headerlink&quot; title=&quot;一、Class Loading Linking </summary>
+      
+    
+    
+    
+    <category term="JVM基础" scheme="https://woshiqianmo.github.io/categories/JVM%E5%9F%BA%E7%A1%80/"/>
+    
+    
+    <category term="JVM基础" scheme="https://woshiqianmo.github.io/tags/JVM%E5%9F%BA%E7%A1%80/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>01-JVM基础</title>
+    <link href="https://woshiqianmo.github.io/2021/04/18/JVM/01-JVM%E5%9F%BA%E7%A1%80/"/>
+    <id>https://woshiqianmo.github.io/2021/04/18/JVM/01-JVM%E5%9F%BA%E7%A1%80/</id>
+    <published>2021-04-18T11:16:34.000Z</published>
+    <updated>2021-04-18T12:52:01.072Z</updated>
+    
+    <content type="html"><![CDATA[<h5 id="一、Java从编码到执行"><a href="#一、Java从编码到执行" class="headerlink" title="一、Java从编码到执行"></a>一、Java从编码到执行</h5><p>javac x.java —&gt; javac —&gt; x.class —&gt; ClassLoader（java类库装载到classLoader） –&gt; 字节码解释器/JIT即时编译器–&gt;执行引擎—&gt;OS硬件</p><h5 id="二、JVM"><a href="#二、JVM" class="headerlink" title="二、JVM"></a>二、JVM</h5><ul><li> 从跨平台的语言到跨语言的平台</li><li>java、scala、kotlin、groovy、clojure、jython、jruby…</li></ul><h5 id="三、JVM"><a href="#三、JVM" class="headerlink" title="三、JVM"></a>三、JVM</h5><ul><li>jvm 是一种规范<ul><li><a href="https://docs.oracle.com/en/java/javase/13/">https://docs.oracle.com/en/java/javase/13/</a></li><li><a href="https://docs.oracle.com/en/java/specs/index.html">https://docs.oracle.com/en/java/specs/index.html</a></li></ul></li><li>虚拟出来的一台计算机<ul><li>字节码指令集（汇编语言）</li><li>内存管理：堆、栈、方法区等</li></ul></li></ul><h5 id="四、常见的JVM实现"><a href="#四、常见的JVM实现" class="headerlink" title="四、常见的JVM实现"></a>四、常见的JVM实现</h5><ul><li>Hotspot<ul><li>oracle官网，我们做试验用的JVM</li><li>java -version</li></ul></li><li>Jrockit<ul><li>BEA，曾经号称世界上最快的JVM</li><li>被Oracle收购，合并于hotspot</li></ul></li><li>J9 - IBM</li><li>Microsoft VM</li><li>TaobaoVM<ul><li>hotspot深度定制</li></ul></li><li>LiquidVM<ul><li>直接针对硬件</li></ul></li><li>azuzing<ul><li>最新垃圾回收的业界标杆(垃圾回收快)</li><li><a href="http://www.azul.com/">www.azul.com</a></li></ul></li></ul><h5 id="五、JDK-JRE-JVM"><a href="#五、JDK-JRE-JVM" class="headerlink" title="五、JDK JRE JVM"></a>五、JDK JRE JVM</h5><p>JDK = jre + development kit</p><p>JRE = jvm + core lib</p><p>JVM</p><h5 id="六、Class-File-Format"><a href="#六、Class-File-Format" class="headerlink" title="六、Class File Format"></a>六、Class File Format</h5><ul><li><p>二进制字节流</p></li><li><p>数据类型： u1 u2 u4 u8 和 _info(表类型)</p><ul><li>_info 的来源是hotspot源码中的写法</li></ul></li><li><p>查看16进制格式的ClassFile</p><ul><li>sublime 、notepad</li><li>IDEA插件 - BinEd</li></ul></li><li><p>有很多可以观察ByteCode方法：</p><ul><li>javap</li><li>JBE - 可以直接修改</li><li>JClassLib - IDEA插件之一</li></ul></li><li><p>classfile构成</p><ul><li><p>ClassFile{</p><p>​    u4 magic;    CA FE BA BE     4个字节</p><p>​    u2 minor_version; 00 00 版本52.0    2个字节</p><p>​    u2 major_version; 00 34 JDK版本    2个字节</p><p>​    u2 constant_pool_count; 常量池 65536    从1开始</p><p>​    cp_info constant_pool [constant_pool_count - 1]; 长度为65535 </p><p>​    u2 access_flags    修饰词 public final 等</p><p>​    u2 this_class</p><p>​    u2 super_class</p><p>​    u2 interfaces _count</p><p>​    u2 interfaces 接口个数</p><p>​    u2 fields_count</p><p>​    u2 fields    属性</p><p>​    u2 methods_count</p><p>​    u2 methods    方法个数</p><p>​    u2 attributes    其它附加属性</p><p>}</p></li></ul></li></ul><p>Javap -v xx.class 查看.class文件内容</p><h5 id="七、Constant-pool常量池"><a href="#七、Constant-pool常量池" class="headerlink" title="七、Constant pool常量池"></a>七、Constant pool常量池</h5><p>所有第一个字节代表标志</p><ul><li>1.CONSTANT_Utf8_info    </li><li>3.CONSTANT_Integer_info</li><li>4.CONSTANT_Float_info</li><li>5.CONSTANT_Long_info</li><li>6.CONSTANT_Dobule_info</li><li>7.CONSTANT_Class_info</li><li>8.CONSTANT_String_info</li><li>9.CONSTANT_Fieldref_info</li><li>10.CONSTANT_Methodref_info</li><li>11.CONSTANT_InterfaceMethodref_info</li><li>12.CONSTANT_NameAndType_info</li><li>15.CONSTANT_MethodHandle_info</li><li>16.CONSTANT_MethodType_info</li><li>18.CONSTANT_InvokeDynamic_info</li></ul>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h5 id=&quot;一、Java从编码到执行&quot;&gt;&lt;a href=&quot;#一、Java从编码到执行&quot; class=&quot;headerlink&quot; title=&quot;一、Java从编码到执行&quot;&gt;&lt;/a&gt;一、Java从编码到执行&lt;/h5&gt;&lt;p&gt;javac x.java —&amp;gt; javac —&amp;gt;</summary>
+      
+    
+    
+    
+    <category term="JVM基础" scheme="https://woshiqianmo.github.io/categories/JVM%E5%9F%BA%E7%A1%80/"/>
+    
+    
+    <category term="JVM基础" scheme="https://woshiqianmo.github.io/tags/JVM%E5%9F%BA%E7%A1%80/"/>
+    
+  </entry>
   
   <entry>
     <title>09-多线程与高并发</title>

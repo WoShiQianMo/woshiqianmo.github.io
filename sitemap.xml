@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://woshiqianmo.github.io/2021/04/18/JVM/02-JVM%E5%9F%BA%E7%A1%80/</loc>
+    
+    <lastmod>2021-04-18</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://woshiqianmo.github.io/2021/04/18/JVM/01-JVM%E5%9F%BA%E7%A1%80/</loc>
+    
+    <lastmod>2021-04-18</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://woshiqianmo.github.io/2021/04/18/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E9%AB%98%E5%B9%B6%E5%8F%91/09-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E9%AB%98%E5%B9%B6%E5%8F%91/</loc>
     
     <lastmod>2021-04-18</lastmod>
@@ -102,6 +116,13 @@
 
   
   <url>
+    <loc>https://woshiqianmo.github.io/tags/JVM%E5%9F%BA%E7%A1%80/</loc>
+    <lastmod>2021-04-18</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://woshiqianmo.github.io/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E9%AB%98%E5%B9%B6%E5%8F%91/</loc>
     <lastmod>2021-04-18</lastmod>
     <changefreq>daily</changefreq>
@@ -116,6 +137,13 @@
   </url>
   
 
+  
+  <url>
+    <loc>https://woshiqianmo.github.io/categories/JVM%E5%9F%BA%E7%A1%80/</loc>
+    <lastmod>2021-04-18</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
   
   <url>
     <loc>https://woshiqianmo.github.io/categories/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E9%AB%98%E5%B9%B6%E5%8F%91/</loc>
