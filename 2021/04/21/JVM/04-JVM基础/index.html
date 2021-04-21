@@ -1,0 +1,118 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>04-JVM基础 | Hexo</title><script src="https://cdn.bootcss.com/valine/1.4.4/Valine.min.js"></script><link rel="stylesheet" href="/css/arknights.css"><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/highlight.js/10.1.2/styles/atom-one-dark-reasonable.min.css"><style>@font-face {
+ font-family: BenderLight;
+ src: local('Bender'), url("/font/BenderLight.ttf");
+}
+@font-face {
+ font-family: 'JetBrains Mono';
+ src: local('JetBrains Mono'), url('/font/JetBrainsMono-Regular.woff2') format('woff2');
+}</style><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head><body><header><nav><a href="/">Home</a><a href="/archives/">Archives</a></nav></header><main style="flex-direction: row-reverse"><article><div id="post-bg"><div id="post-title"><h1>04-JVM基础</h1><hr></div><div id="post-content"><h5 id="一、对象的内存布局（面试题）"><a href="#一、对象的内存布局（面试题）" class="headerlink" title="一、对象的内存布局（面试题）"></a>一、对象的内存布局（面试题）</h5><ul>
+<li><p>1.解释一下对象的创建过程</p>
+<ul>
+<li>1.1 class loading</li>
+<li>1.2 class linking(verification,preparation,resolution)</li>
+<li>1.3 lass initializing</li>
+<li>1.4 申请对象内存</li>
+<li>1.5 成员变量赋默认值</li>
+<li>1.6 调用构造方法<init><ul>
+<li>1.成员变量顺序赋初始值</li>
+<li>2.执行构造方法语句</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>2.对象在内存中的存储布局</p>
+<ul>
+<li><p>观察虚拟机配置：java -XX:+PrintCommandLineFlags -version</p>
+</li>
+<li><p>普通对象</p>
+<ul>
+<li>1.对象头：markword 8</li>
+<li>2.ClassPointer指针：-XX:+UseCompressedClassPointers 为4字节 不开启为8字节</li>
+<li>3.实例数据<ul>
+<li>引用类型：-XX:+UseCompressedOops 为4字节 不开启为8字节 Oops Ordinary Object</li>
+</ul>
+</li>
+<li>4.PointersPadding对齐，8的倍数</li>
+</ul>
+</li>
+<li><p>数组对象</p>
+<ul>
+<li><p>1.对象头：markword 8</p>
+</li>
+<li><p>2.ClassPointer指针同上</p>
+</li>
+<li><p>3.数组长度：4字节</p>
+</li>
+<li><p>4.数组数据</p>
+</li>
+<li><p>5.对齐 8的倍数</p>
+</li>
+<li><p>试验</p>
+<ul>
+<li>1.新建项目ObjectSize(1.8)</li>
+<li>2.创建文件ObjectSizeAgent</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs JAVA"><span class="hljs-keyword">package</span> com.mashibing.jvm.agent;<br><br><span class="hljs-keyword">import</span> java.lang.instrument.Instrumentation;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ObjectSizeAgent</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Instrumentation inst;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">premain</span><span class="hljs-params">(String agentArgs, Instrumentation _inst)</span> </span>&#123;<br>        inst = _inst;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">long</span> <span class="hljs-title">sizeOf</span><span class="hljs-params">(Object o)</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> inst.getObjectSize(o);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>3.src目录下创建META-INF/MANIFEST.MF</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java">Manifest-Version: <span class="hljs-number">1.0</span><br>Created-By: baize.com<br>Premain-Class: com.baize.jvm.agent.ObjectSizeAgent<br></code></pre></td></tr></table></figure>
+
+<p>注意Premain-Class这行必须是新的一行（回车 + 换行），确认idea不能有任何错误提示</p>
+<ul>
+<li>4.打包jar文件</li>
+<li>5.在需要使用该Agent Jar的项目中引入该Jar包   project structure - project settings - library 添加该jar包</li>
+<li>6.运行时需要该Agent Jar的类，加入参数：</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">-javaagent:C:\work\ijprojects\ObjectSize\out\artifacts\ObjectSize_jar\ObjectSize.jar<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>7.如何使用该类：</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.mashibing.jvm.c3_jmm;<br>  <br>  <span class="hljs-keyword">import</span> com.mashibing.jvm.agent.ObjectSizeAgent;<br>  <br>  <span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">T03_SizeOfAnObject</span> </span>&#123;<br>      <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>          System.out.println(ObjectSizeAgent.sizeOf(<span class="hljs-keyword">new</span> Object()));<br>          System.out.println(ObjectSizeAgent.sizeOf(<span class="hljs-keyword">new</span> <span class="hljs-keyword">int</span>[] &#123;&#125;));<br>          System.out.println(ObjectSizeAgent.sizeOf(<span class="hljs-keyword">new</span> P()));<br>      &#125;<br>  <br>      <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">P</span> </span>&#123;<br>                          <span class="hljs-comment">//8 _markword</span><br>                          <span class="hljs-comment">//4 _oop指针</span><br>          <span class="hljs-keyword">int</span> id;         <span class="hljs-comment">//4</span><br>          String name;    <span class="hljs-comment">//4</span><br>          <span class="hljs-keyword">int</span> age;        <span class="hljs-comment">//4</span><br>  <br>          <span class="hljs-keyword">byte</span> b1;        <span class="hljs-comment">//1</span><br>          <span class="hljs-keyword">byte</span> b2;        <span class="hljs-comment">//1</span><br>  <br>          Object o;       <span class="hljs-comment">//4</span><br>          <span class="hljs-keyword">byte</span> b3;        <span class="hljs-comment">//1</span><br>  <br>      &#125;<br>  &#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h6 id="Hotspot开启内存压缩的规则（64位机）"><a href="#Hotspot开启内存压缩的规则（64位机）" class="headerlink" title="Hotspot开启内存压缩的规则（64位机）"></a>Hotspot开启内存压缩的规则（64位机）</h6><ol>
+<li>4G以下，直接砍掉高32位</li>
+<li>4G - 32G，默认开启内存压缩 ClassPointers Oops</li>
+<li>32G，压缩无效，使用64位   内存并不是越大越好（^-^）</li>
+</ol>
+<ul>
+<li><p>3.对象头具体包括什么</p>
+<ul>
+<li><h6 id="IdentityHashCode的问题"><a href="#IdentityHashCode的问题" class="headerlink" title="IdentityHashCode的问题"></a>IdentityHashCode的问题</h6><ul>
+<li>回答白马非马的问题：<ul>
+<li>当一个对象计算过identityHashCode之后，不能进入偏向锁状态</li>
+</ul>
+</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1484167">https://cloud.tencent.com/developer/article/1484167</a><br><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1485795">https://cloud.tencent.com/developer/article/1485795</a><br><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1482500">https://cloud.tencent.com/developer/article/1482500</a></p>
+<p><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1480590">https://cloud.tencent.com/developer/article/1480590</a> </p>
+</li>
+</ul>
+</li>
+<li><p>4.对象怎么定位</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/clover_lily/article/details/80095580">https://blog.csdn.net/clover_lily/article/details/80095580</a></p>
+<ol>
+<li><p>句柄池</p>
+</li>
+<li><p>直接指针</p>
+</li>
+</ol>
+</li>
+<li><p>5.对象怎么分配</p>
+</li>
+<li><p>6.Object o =new Object在内存中占用多少字节</p>
+</li>
+</ul>
+<div id="paginator"></div></div><div id="post-footer"><hr><a href="/2021/04/21/JVM/05-JVM%E5%9F%BA%E7%A1%80/">← Prev 05-JVM基础</a><span style="color: #fe2"> | </span><a href="/2021/04/19/JVM/03-JVM%E5%9F%BA%E7%A1%80/">03-JVM基础 Next →</a><hr></div><div id="bottom-btn"><a id="to-top" href="#post-title" title="to top">∧</a></div><div id="Valine"></div><script>new Valine({
+ el: '#Valine'
+ , appId: ''
+ , appKey: ''
+ , placeholder: '此条评论委托企鹅物流发送'
+})</script></div></article><aside><div id="about"><a href="/" id="logo"><img src="https://scpic.chinaz.net/files/pic/pic9/202104/apic31860.jpg" alt="Logo"></a><h1 id="Dr"><a href="/"> Dr.浅陌</a></h1><section id="total"><a id="total-archives" href="/archives"><span class="total-title">Archives Total:</span><span class="total-number">16</span></a><div id="total-tags"><span class="total-title">Tags:</span><span class="total-number">3</span></div><div id="total-categories"><span class="total-title">Categories:</span><span class="total-number">3</span></div></section></div><div id="aside-block" style="order: -1"></div><footer style="text-align: right"><wbr></footer></aside></main><canvas id="canvas-dust"></canvas><script src="/js/arknights.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/10.1.2/highlight.min.js"></script></body></html>

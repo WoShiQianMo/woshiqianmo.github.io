@@ -76,11 +76,11 @@
 
 <p>如果顺序执行：xy结果可能只有 01 10 11</p>
 <p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1618933613606.png" alt="乱序结果"> </p>
-<h6 id="5-3-如何保证有序性？"><a href="#5-3-如何保证有序性？" class="headerlink" title="5.3 如何保证有序性？"></a>5.3 如何保证有序性？</h6><p>在硬件层面：有序性保障CPU内存屏障 </p>
+<h6 id="5-3-如何保证有序性？"><a href="#5-3-如何保证有序性？" class="headerlink" title="5.3 如何保证有序性？"></a>5.3 如何保证有序性？</h6><p>x86在硬件层面：有序性保障CPU内存屏障 </p>
 <ul>
-<li>sfence：在sfence指令前的写操作当必须在sfence指令后的写操作前完成</li>
-<li>Ifence：在Ifence指令前的读操作当必须在sfence指令后的读操作前完成</li>
-<li>mfence：在mfence指令前的读写操作当必须在sfence指令后的读写操作前完成</li>
+<li>sfence：store 在sfence指令前的写操作当必须在sfence指令后的写操作前完成</li>
+<li>Ifence：load 在Ifence指令前的读操作当必须在sfence指令后的读操作前完成</li>
+<li>mfence：mix在mfence指令前的读写操作当必须在sfence指令后的读写操作前完成</li>
 </ul>
 <p>有序性保障intel lock汇编指令(java 的汇编指令)</p>
 <p>JMM模型与内存屏障：Java内存模型中volatile变量在写操作之后会插入一个store屏障，在读操作之前会插入一个load屏障。一个类的final字段会在初始化后插入一个store屏障，来确保final字段在构造函数初始化完成并可被使用时可见</p>
@@ -91,6 +91,8 @@
 <li>LoadStore屏障：对于这样的语句Load1; LoadStore; Store2，在Store2及后续写入操作被刷出前，保证Load1要读取的数据被读取完毕。</li>
 <li>StoreLoad屏障：对于这样的语句Store1; StoreLoad; Load2，在Load2及后续所有读取操作执行前，保证Store1的写入对所有处理器可见。</li>
 </ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TestVolatile</span> </span>&#123;<br>    <span class="hljs-keyword">int</span> i;<br>    <span class="hljs-keyword">volatile</span> <span class="hljs-keyword">int</span> j;<br>&#125;<br></code></pre></td></tr></table></figure>
+
 <p>volatile的实现细节：</p>
 <ul>
 <li>字节码层面 ACC_VOLATILE</li>
@@ -105,6 +107,8 @@
 </li>
 <li><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_26222859/article/details/52235930">OS和硬件层面</a> hsdis - HotSpot Dis Assembler windows lock 指令实现 | MESI实现</li>
 </ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TestSync</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title">m</span><span class="hljs-params">()</span> </span>&#123;<br><br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">n</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">synchronized</span> (<span class="hljs-keyword">this</span>) &#123;<br><br>        &#125;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
 <p>synchronized的实现细节：</p>
 <ul>
 <li>字节码层面 ACC_SYNCHRONIZED monitorenter monitorexit</li>
@@ -114,9 +118,9 @@
 </ul>
 </li>
 </ul>
-<div id="paginator"></div></div><div id="post-footer"><hr><a href="/2021/04/18/JVM/02-JVM%E5%9F%BA%E7%A1%80/">02-JVM基础 Next →</a><hr></div><div id="bottom-btn"><a id="to-top" href="#post-title" title="to top">∧</a></div><div id="Valine"></div><script>new Valine({
+<div id="paginator"></div></div><div id="post-footer"><hr><a href="/2021/04/21/JVM/04-JVM%E5%9F%BA%E7%A1%80/">← Prev 04-JVM基础</a><span style="color: #fe2"> | </span><a href="/2021/04/18/JVM/02-JVM%E5%9F%BA%E7%A1%80/">02-JVM基础 Next →</a><hr></div><div id="bottom-btn"><a id="to-top" href="#post-title" title="to top">∧</a></div><div id="Valine"></div><script>new Valine({
  el: '#Valine'
  , appId: ''
  , appKey: ''
  , placeholder: '此条评论委托企鹅物流发送'
-})</script></div></article><aside><div id="about"><a href="/" id="logo"><img src="https://scpic.chinaz.net/files/pic/pic9/202104/apic31860.jpg" alt="Logo"></a><h1 id="Dr"><a href="/"> Dr.浅陌</a></h1><section id="total"><a id="total-archives" href="/archives"><span class="total-title">Archives Total:</span><span class="total-number">14</span></a><div id="total-tags"><span class="total-title">Tags:</span><span class="total-number">3</span></div><div id="total-categories"><span class="total-title">Categories:</span><span class="total-number">3</span></div></section></div><div id="aside-block" style="order: -1"></div><footer style="text-align: right"><wbr></footer></aside></main><canvas id="canvas-dust"></canvas><script src="/js/arknights.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/10.1.2/highlight.min.js"></script></body></html>
+})</script></div></article><aside><div id="about"><a href="/" id="logo"><img src="https://scpic.chinaz.net/files/pic/pic9/202104/apic31860.jpg" alt="Logo"></a><h1 id="Dr"><a href="/"> Dr.浅陌</a></h1><section id="total"><a id="total-archives" href="/archives"><span class="total-title">Archives Total:</span><span class="total-number">16</span></a><div id="total-tags"><span class="total-title">Tags:</span><span class="total-number">3</span></div><div id="total-categories"><span class="total-title">Categories:</span><span class="total-number">3</span></div></section></div><div id="aside-block" style="order: -1"></div><footer style="text-align: right"><wbr></footer></aside></main><canvas id="canvas-dust"></canvas><script src="/js/arknights.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/10.1.2/highlight.min.js"></script></body></html>
