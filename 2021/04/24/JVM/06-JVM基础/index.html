@@ -1,0 +1,186 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>06-JVM基础 | Hexo</title><script src="https://cdn.bootcss.com/valine/1.4.4/Valine.min.js"></script><link rel="stylesheet" href="/css/arknights.css"><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/highlight.js/10.1.2/styles/atom-one-dark-reasonable.min.css"><style>@font-face {
+ font-family: BenderLight;
+ src: local('Bender'), url("/font/BenderLight.ttf");
+}
+@font-face {
+ font-family: 'JetBrains Mono';
+ src: local('JetBrains Mono'), url('/font/JetBrainsMono-Regular.woff2') format('woff2');
+}</style><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head><body><header><nav><a href="/">Home</a><a href="/archives/">Archives</a></nav></header><main style="flex-direction: row-reverse"><article><div id="post-bg"><div id="post-title"><h1>06-JVM基础</h1><hr></div><div id="post-content"><center><h2>Grabage Collector GC tuning(垃圾回收器，调优)
+
+<p>目标：熟悉GC常用算法，熟悉常见垃圾收集器，具有实际JVM调优实战经验</p>
+<h5 id="一、垃圾"><a href="#一、垃圾" class="headerlink" title="一、垃圾"></a>一、垃圾</h5><ul>
+<li>没有任何引用指向</li>
+</ul>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619245386684.png" alt="grabage"></p>
+<h6 id="1-1-java-vs-c"><a href="#1-1-java-vs-c" class="headerlink" title="1.1 java vs c++"></a>1.1 java vs c++</h6><ul>
+<li>java<ul>
+<li>GC处理垃圾啊</li>
+<li>开发效率高，执行效率低</li>
+</ul>
+</li>
+<li>C++<ul>
+<li>手工处理垃圾</li>
+<li>忘记回收<ul>
+<li>内存泄漏</li>
+</ul>
+</li>
+<li>回收多次<ul>
+<li>非法访问</li>
+</ul>
+</li>
+<li>开发效率低，执行效率高</li>
+</ul>
+</li>
+</ul>
+<h6 id="1-2-如何找到垃圾（找垃圾两种算法：引用计数算法，根可达算法）"><a href="#1-2-如何找到垃圾（找垃圾两种算法：引用计数算法，根可达算法）" class="headerlink" title="1.2 如何找到垃圾（找垃圾两种算法：引用计数算法，根可达算法）"></a>1.2 如何找到垃圾（找垃圾两种算法：引用计数算法，根可达算法）</h6><ul>
+<li>reference count 引用计数算法</li>
+</ul>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619245589763.png" alt="reference count"></p>
+<p>引用记数不能解决循环引用</p>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619245633337.png" alt="引用记数不能解决循环引用"></p>
+<ul>
+<li>根可达算法</li>
+</ul>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619245712700.png" alt="根可达算法"></p>
+<h6 id="1-3-垃圾回收算法"><a href="#1-3-垃圾回收算法" class="headerlink" title="1.3 垃圾回收算法"></a>1.3 垃圾回收算法</h6><ul>
+<li>Mark - Sweep 标记清除</li>
+</ul>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619245883480.png" alt="Mark - Sweep"></p>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619245916173.png" alt="标记清除的问题"></p>
+<ul>
+<li>Copying 拷贝</li>
+</ul>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619245965758.png" alt="Copying"></p>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619245984763.png" alt="copy算法的问题"></p>
+<ul>
+<li>Mark - Compact 标记压缩</li>
+</ul>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619246026129.png" alt="Mark - Compact"></p>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619246046141.png" alt="标记压缩问题"></p>
+<h6 id="1-4-堆内存逻辑分区-不适用不分代垃圾收集器"><a href="#1-4-堆内存逻辑分区-不适用不分代垃圾收集器" class="headerlink" title="1.4 堆内存逻辑分区(不适用不分代垃圾收集器)"></a>1.4 堆内存逻辑分区(不适用不分代垃圾收集器)</h6><p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619246371399.png" alt="内存"></p>
+<ul>
+<li>栈上分配<ul>
+<li>线程私有小对象</li>
+<li>支持标量替换</li>
+<li>无逃逸</li>
+<li>无需调整</li>
+</ul>
+</li>
+<li>线程本地分配TLAB （Thread Local Allocation Buffer）<ul>
+<li>占用eden，默认1%</li>
+<li>多线程的时候不用竞争eden就可以申请空间，提高效率</li>
+<li>小对象</li>
+<li>无需调整</li>
+</ul>
+</li>
+<li>老年代<ul>
+<li>大对象</li>
+</ul>
+</li>
+<li>eden</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">//-XX:-DoEscapeAnalysis -XX:-EliminateAllocations -XX:-UseTLAB -Xlog:c5_gc*</span><br><span class="hljs-comment">// 逃逸分析 标量替换 线程专有对象分配</span><br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TestTLAB</span> </span>&#123;<br>    <span class="hljs-comment">//User u;</span><br>    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span> </span>&#123;<br>        <span class="hljs-keyword">int</span> id;<br>        String name;<br><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">User</span><span class="hljs-params">(<span class="hljs-keyword">int</span> id, String name)</span> </span>&#123;<br>            <span class="hljs-keyword">this</span>.id = id;<br>            <span class="hljs-keyword">this</span>.name = name;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">alloc</span><span class="hljs-params">(<span class="hljs-keyword">int</span> i)</span> </span>&#123;<br>        <span class="hljs-keyword">new</span> User(i, <span class="hljs-string">&quot;name &quot;</span> + i); <span class="hljs-comment">//没有赋值给外层，无逃逸</span><br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        TestTLAB t = <span class="hljs-keyword">new</span> TestTLAB();<br>        <span class="hljs-keyword">long</span> start = System.currentTimeMillis();<br>        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>; i&lt;<span class="hljs-number">1000_0000</span>; i++) t.alloc(i);<br>        <span class="hljs-keyword">long</span> end = System.currentTimeMillis();<br>        System.out.println(end - start);<br><br>        <span class="hljs-comment">//for(;;);</span><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h6 id="1-5-对象何时进入老年代"><a href="#1-5-对象何时进入老年代" class="headerlink" title="1.5 对象何时进入老年代"></a>1.5 对象何时进入老年代</h6><ul>
+<li>超过 XX:MaxTenuringThreshold指定次数（YGC）<ul>
+<li>Parallel Scavenge 15</li>
+<li>CMS 6</li>
+<li>G1 15</li>
+</ul>
+</li>
+<li>动态年龄 (不重要)  <a target="_blank" rel="noopener" href="https://www.jianshu.com/p/989d3b06a49d">https://www.jianshu.com/p/989d3b06a49d</a><ul>
+<li>s1 -&gt; s2 超过50%</li>
+<li>把年龄最大的放入Old</li>
+</ul>
+</li>
+</ul>
+<p>Eden + s1  &gt;s2 * 1/2 直接放入Old</p>
+<ul>
+<li><p>分配担保（不重要） YGC期间 survivor区空间不够了 空间担保直接进入老年代 参考：<a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1082730">https://cloud.tencent.com/developer/article/1082730</a></p>
+</li>
+<li><p>对象分配过程图</p>
+</li>
+</ul>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619247113197.png" alt="对象分配过程图"></p>
+<h6 id="1-6-常见的垃圾回收器"><a href="#1-6-常见的垃圾回收器" class="headerlink" title="1.6 常见的垃圾回收器"></a>1.6 常见的垃圾回收器</h6><p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619247471357.png" alt="常见的垃圾回收器"></p>
+<p>常见组合：Serial + SerialOld、CMS+ParNew、Parallerl Scavenge + Parallel Old</p>
+<ol>
+<li>JDK诞生 Serial追随 提高效率，诞生了PS，为了配合CMS，诞生了PN，CMS是1.4版本后期引入，CMS是里程碑式的GC，它开启了并发回收的过程，但是CMS毛病较多，因此目前任何一个JDK版本默认是CMS 并发垃圾回收是因为无法忍受STW</li>
+<li>Serial 年轻代 串行回收   单线程</li>
+</ol>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619260695808.png" alt="Serial "></p>
+<ol start="3">
+<li>PS（Parallel Scavenge） 年轻代 并行回收</li>
+</ol>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619260877718.png" alt="Parallel Scavenge"></p>
+<ol start="4">
+<li>ParNew 年轻代 配合CMS的并行回收</li>
+</ol>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619261119388.png" alt="ParNew"></p>
+<ol start="5">
+<li>SerialOld 标记压缩，单线程垃圾回收</li>
+</ol>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619260831807.png" alt="SerialOld"></p>
+<ol start="6">
+<li>ParallelOld 整理算法</li>
+</ol>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619260988083.png" alt="ParallelOld"></p>
+<ol start="7">
+<li>ConcurrentMarkSweep （CMS）老年代 并发的， 垃圾回收和应用程序同时运行，降低STW的时间(200ms) CMS问题比较多，所以现在没有一个版本默认是CMS，只能手工指定 CMS既然是MarkSweep，就一定会有碎片化的问题，碎片到达一定程度，CMS的老年代分配对象分配不下的时候，使用SerialOld 进行老年代回收 想象一下： PS + PO -&gt; 加内存 换垃圾回收器 -&gt; PN + CMS + SerialOld（几个小时 - 几天的STW） 几十个G的内存，单线程回收 -&gt; G1 + FGC 几十个G -&gt; 上T内存的服务器 ZGC 算法：三色标记 + Incremental Update</li>
+</ol>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619261373053.png" alt="CMS"></p>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619261559002.png" alt="并发"></p>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619262149274.png" alt="CMS concurrent mark"></p>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619262216764.png" alt="CMS remark"></p>
+<ul>
+<li><p>CMS的问题：</p>
+<ul>
+<li><p>1.Memory Fragmentation 碎片化</p>
+<blockquote>
+<p>-XX:+UseCMSCompactAtFullCollection</p>
+<p>-XX:CMSFullGCsBeforeCompaction 默认为0 指的是经过多少次FGC才进行压缩</p>
+</blockquote>
+</li>
+<li><p>2.Floating Garbage 浮动垃圾</p>
+<blockquote>
+<p>Concurrent Mode Failure</p>
+<p>产生：if the concurrent collector is unable to finish reclaiming the unreachable objects before the tenured generation fills up, or if an allocation cannot be satisfiedwith the available free space blocks in the tenured generation, then theapplication is paused and the collection is completed with all the applicationthreads stopped</p>
+<p>解决方案：降低触发CMS的阈值&gt;&gt; PromotionFailed&gt;&gt; 解决方案类似，保持老年代有足够的空间</p>
+<p> –XX:CMSInitiatingOccupancyFraction 92% 可以降低这个值，让CMS保持老年代足够的空间</p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+<p>算法：三色标记+Incremental Update</p>
+<ol start="8">
+<li>G1(10ms) 算法：三色标记 + SATB</li>
+</ol>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619263637814.png" alt="并发标记算法"></p>
+<ol start="9">
+<li><p>ZGC (1ms) PK C++ 算法：ColoredPointers + LoadBarrier</p>
+</li>
+<li><p>Shenandoah 算法：ColoredPointers + WriteBarrier</p>
+</li>
+<li><p>Eplison</p>
+</li>
+<li><p>PS 和 PN区别的延伸阅读： ▪<a target="_blank" rel="noopener" href="https://docs.oracle.com/en/java/javase/13/gctuning/ergonomics.html">https://docs.oracle.com/en/java/javase/13/gctuning/ergonomics.html#GUID-3D0BB91E-9BFF-4EBB-B523-14493A860E73</a></p>
+</li>
+<li><p>垃圾收集器跟内存大小的关系</p>
+<ol>
+<li>Serial 几十兆</li>
+<li>PS 上百兆 - 几个G</li>
+<li>CMS - 20G</li>
+<li>G1 - 上百G</li>
+<li>ZGC - 4T - 16T（JDK13）</li>
+</ol>
+</li>
+</ol>
+<p>1.8默认的垃圾回收：PS + ParallelOld</p>
+<div id="paginator"></div></div><div id="post-footer"><hr><a href="/2021/04/24/JVM/07-JVM%E5%9F%BA%E7%A1%80/">← Prev 07-JVM基础</a><span style="color: #fe2"> | </span><a href="/2021/04/22/SpringBoot/1-SpringBoot%E5%85%A5%E9%97%A8/">1.SpringBoot入门 Next →</a><hr></div><div id="bottom-btn"><a id="to-top" href="#post-title" title="to top">∧</a></div><div id="Valine"></div><script>new Valine({
+ el: '#Valine'
+ , appId: ''
+ , appKey: ''
+ , placeholder: '此条评论委托企鹅物流发送'
+})</script></div></article><aside><div id="about"><a href="/" id="logo"><img src="https://scpic.chinaz.net/files/pic/pic9/202104/apic31860.jpg" alt="Logo"></a><h1 id="Dr"><a href="/"> Dr.浅陌</a></h1><section id="total"><a id="total-archives" href="/archives"><span class="total-title">Archives Total:</span><span class="total-number">19</span></a><div id="total-tags"><span class="total-title">Tags:</span><span class="total-number">4</span></div><div id="total-categories"><span class="total-title">Categories:</span><span class="total-number">4</span></div></section></div><div id="aside-block" style="order: -1"></div><footer style="text-align: right"><wbr></footer></aside></main><canvas id="canvas-dust"></canvas><script src="/js/arknights.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/10.1.2/highlight.min.js"></script></body></html>
