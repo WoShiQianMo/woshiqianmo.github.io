@@ -181,18 +181,141 @@
 </li>
 <li><p>jmap - histo 4655 | head -20，查找有多少对象产生</p>
 </li>
-<li><p>jmap -dump:format=b,file=xxx pid ：</p>
+<li><p>jmap -dump:format=b,file=xxx pid ： 不要线上导出堆存储文件</p>
 </li>
 </ol>
 <p>线上系统，内存特别大，jmap执行期间会对进程产生很大影响，甚至卡顿（电商不适合） 1：设定了参数HeapDump，OOM的时候会自动产生堆转储文件 2：很多服务器备份（高可用），停掉这台服务器对其他服务器不影响 3：在线定位(一般小点儿公司用不到)</p>
 <ol start="12">
-<li><p>java -Xms20M -Xmx20M -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError com.mashibing.jvm.gc.T15_FullGC_Problem01</p>
+<li>java -Xms20M -Xmx20M -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError com.mashibing.jvm.gc.T15_FullGC_Problem01</li>
+<li>使用MAT / jhat /jvisualvm 进行dump文件分析 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/baihuitestsoftware/articles/6406271.html">https://www.cnblogs.com/baihuitestsoftware/articles/6406271.html</a> jhat -J-mx512M xxx.dump<a target="_blank" rel="noopener" href="http://192.168.17.11:7000/">http://192.168.17.11:7000</a> 拉到最后：找到对应链接 可以使用OQL查找特定问题对象</li>
+<li>找到代码的问题</li>
+</ol>
+<h6 id="jconsole远程连接"><a href="#jconsole远程连接" class="headerlink" title="jconsole远程连接"></a>jconsole远程连接</h6><ol>
+<li><p>程序启动加入参数：</p>
+<blockquote>
+<p>java -Djava.rmi.server.hostname=192.168.17.11 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=11111 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false XXX</p>
+</blockquote>
 </li>
-<li><p>使用MAT / jhat /jvisualvm 进行dump文件分析 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/baihuitestsoftware/articles/6406271.html">https://www.cnblogs.com/baihuitestsoftware/articles/6406271.html</a> jhat -J-mx512M xxx.dump<a target="_blank" rel="noopener" href="http://192.168.17.11:7000/">http://192.168.17.11:7000</a> 拉到最后：找到对应链接 可以使用OQL查找特定问题对象</p>
+<li><p>如果遭遇 Local host name unknown：XXX的错误，修改/etc/hosts文件，把XXX加入进去</p>
+<blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-number">192.168</span><span class="hljs-number">.17</span><span class="hljs-number">.11</span> basic localhost localhost.localdomain localhost4 localhost4.localdomain4<br>::<span class="hljs-number">1</span>         localhost localhost.localdomain localhost6 localhost6.localdomain6<br></code></pre></td></tr></table></figure></blockquote>
 </li>
-<li><p>找到代码的问题</p>
+<li><p>关闭linux防火墙（实战中应该打开对应端口）</p>
+<blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">service iptables stop<br>chkconfig iptables off #永久关闭<br></code></pre></td></tr></table></figure></blockquote>
+</li>
+<li><p>windows上打开 jconsole远程连接 192.168.17.11:11111</p>
 </li>
 </ol>
+<h6 id="jvisualvm远程连接"><a href="#jvisualvm远程连接" class="headerlink" title="jvisualvm远程连接"></a>jvisualvm远程连接</h6><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/liugh/p/7620336.html">https://www.cnblogs.com/liugh/p/7620336.html</a> （简单做法）</p>
+<h6 id="jprofiler-收费"><a href="#jprofiler-收费" class="headerlink" title="jprofiler (收费)"></a>jprofiler (收费)</h6><h4 id="arthas在线排查工具"><a href="#arthas在线排查工具" class="headerlink" title="arthas在线排查工具"></a>arthas在线排查工具</h4><ul>
+<li>为什么需要在线排查？ 在生产上我们经常会碰到一些不好排查的问题，例如线程安全问题，用最简单的threaddump或者heapdump不好查到问题原因。为了排查这些问题，有时我们会临时加一些日志，比如在一些关键的函数里打印出入参，然后重新打包发布，如果打了日志还是没找到问题，继续加日志，重新打包发布。对于上线流程复杂而且审核比较严的公司，从改代码到上线需要层层的流转，会大大影响问题排查的进度。 </li>
+<li>jvm观察jvm信息</li>
+</ul>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619531961400.png" alt="jvm1"></p>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619531990143.png" alt="jvm2"></p>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619532012629.png" alt="jvm3"></p>
+<ul>
+<li>thread定位线程问题</li>
+</ul>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619531928295.png" alt="thread"></p>
+<ul>
+<li>dashboard 观察系统情况</li>
+</ul>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619531875342.png" alt="dashboard"></p>
+<ul>
+<li>heapdump + jhat分析</li>
+</ul>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619532151005.png" alt="heapdump"></p>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619534009283.png" alt="jhat分析"></p>
+<ul>
+<li>jad反编译 动态代理生成类的问题定位 第三方的类（观察代码） 版本问题（确定自己最新提交的版本是不是被使用）</li>
+<li>redefine 热替换 目前有些限制条件：只能改方法实现（方法已经运行完成），不能改方法名， 不能改属性 m() -&gt; mm()</li>
+<li>sc - search class</li>
+<li>watch - watch method</li>
+<li>没有包含的功能：jmap</li>
+</ul>
+<h3 id="案例汇总"><a href="#案例汇总" class="headerlink" title="案例汇总"></a>案例汇总</h3><p>OOM产生的原因多种多样，有些程序未必产生OOM，不断FGC(CPU飙高，但内存回收特别少) （上面案例）</p>
+<ol>
+<li><p>硬件升级系统反而卡顿的问题（见上）</p>
+</li>
+<li><p>线程池不当运用产生OOM问题（见上） 不断的往List里加对象（实在太LOW）</p>
+</li>
+<li><p>smile jira问题 实际系统不断重启 解决问题 加内存 + 更换垃圾回收器 G1 真正问题在哪儿？不知道</p>
+</li>
+<li><p>tomcat http-header-size过大问题（Hector）   会产生Http11OutOfBuffer 占内存</p>
+</li>
+<li><p>lambda表达式导致方法区溢出问题(MethodArea / Perm Metaspace) LambdaGC.java -XX:MaxMetaspaceSize=9M -XX:+PrintGCDetails</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-string">&quot;C:\Program Files\Java\jdk1.8.0_181\bin\java.exe&quot;</span> -XX:MaxMetaspaceSize=9M -XX:+PrintGCDetails <span class="hljs-string">&quot;-javaagent:C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2019.1\lib\idea_rt.jar=49316:C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2019.1\bin&quot;</span> -Dfile.encoding=UTF-<span class="hljs-number">8</span> -classpath <span class="hljs-string">&quot;C:\Program Files\Java\jdk1.8.0_181\jre\lib\charsets.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\deploy.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\access-bridge-64.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\cldrdata.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\dnsns.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\jaccess.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\jfxrt.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\localedata.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\nashorn.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\sunec.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\sunjce_provider.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\sunmscapi.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\sunpkcs11.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\zipfs.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\javaws.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\jce.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\jfr.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\jfxswt.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\jsse.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\management-agent.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\plugin.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\resources.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\rt.jar;C:\work\ijprojects\JVM\out\production\JVM;C:\work\ijprojects\ObjectSize\out\artifacts\ObjectSize_jar\ObjectSize.jar&quot;</span> com.mashibing.jvm.gc.LambdaGC<br>[GC (Metadata GC Threshold) [PSYoungGen: 11341K-&gt;1880K(38400K)] 11341K-&gt;1888K(125952K), <span class="hljs-number">0.0022190</span> secs] [Times: user=<span class="hljs-number">0.00</span> sys=<span class="hljs-number">0.00</span>, real=<span class="hljs-number">0.00</span> secs] <br>[<span class="hljs-function">Full <span class="hljs-title">GC</span> <span class="hljs-params">(Metadata GC Threshold)</span> [PSYoungGen: 1880K-&gt;0<span class="hljs-title">K</span><span class="hljs-params">(38400K)</span>] [ParOldGen: 8K-&gt;1777<span class="hljs-title">K</span><span class="hljs-params">(35328K)</span>] 1888K-&gt;1777<span class="hljs-title">K</span><span class="hljs-params">(73728K)</span>, [Metaspace: 8164K-&gt;8164<span class="hljs-title">K</span><span class="hljs-params">(1056768K)</span>], 0.0100681 secs] [Times: user</span>=<span class="hljs-number">0.02</span> sys=<span class="hljs-number">0.00</span>, real=<span class="hljs-number">0.01</span> secs] <br>[GC (Last ditch collection) [PSYoungGen: 0K-&gt;0K(38400K)] 1777K-&gt;1777K(73728K), <span class="hljs-number">0.0005698</span> secs] [Times: user=<span class="hljs-number">0.00</span> sys=<span class="hljs-number">0.00</span>, real=<span class="hljs-number">0.00</span> secs] <br>[<span class="hljs-function">Full <span class="hljs-title">GC</span> <span class="hljs-params">(Last ditch collection)</span> [PSYoungGen: 0K-&gt;0<span class="hljs-title">K</span><span class="hljs-params">(38400K)</span>] [ParOldGen: 1777K-&gt;1629<span class="hljs-title">K</span><span class="hljs-params">(67584K)</span>] 1777K-&gt;1629<span class="hljs-title">K</span><span class="hljs-params">(105984K)</span>, [Metaspace: 8164K-&gt;8156<span class="hljs-title">K</span><span class="hljs-params">(1056768K)</span>], 0.0124299 secs] [Times: user</span>=<span class="hljs-number">0.06</span> sys=<span class="hljs-number">0.00</span>, real=<span class="hljs-number">0.01</span> secs] <br>java.lang.reflect.InvocationTargetException<br>	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)<br>	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:<span class="hljs-number">62</span>)<br>	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:<span class="hljs-number">43</span>)<br>	at java.lang.reflect.Method.invoke(Method.java:<span class="hljs-number">498</span>)<br>	at sun.instrument.InstrumentationImpl.loadClassAndStartAgent(InstrumentationImpl.java:<span class="hljs-number">388</span>)<br>	at sun.instrument.InstrumentationImpl.loadClassAndCallAgentmain(InstrumentationImpl.java:<span class="hljs-number">411</span>)<br>Caused by: java.lang.OutOfMemoryError: Compressed <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">space</span></span><br><span class="hljs-class">	<span class="hljs-title">at</span> <span class="hljs-title">sun</span>.<span class="hljs-title">misc</span>.<span class="hljs-title">Unsafe</span>.<span class="hljs-title">defineClass</span>(<span class="hljs-title">Native</span> <span class="hljs-title">Method</span>)</span><br>	at sun.reflect.ClassDefiner.defineClass(ClassDefiner.java:63)<br>	at sun.reflect.MethodAccessorGenerator$<span class="hljs-number">1.</span>run(MethodAccessorGenerator.java:<span class="hljs-number">399</span>)<br>	at sun.reflect.MethodAccessorGenerator$<span class="hljs-number">1.</span>run(MethodAccessorGenerator.java:<span class="hljs-number">394</span>)<br>	at java.security.AccessController.doPrivileged(Native Method)<br>	at sun.reflect.MethodAccessorGenerator.generate(MethodAccessorGenerator.java:<span class="hljs-number">393</span>)<br>	at sun.reflect.MethodAccessorGenerator.generateSerializationConstructor(MethodAccessorGenerator.java:<span class="hljs-number">112</span>)<br>	at sun.reflect.ReflectionFactory.generateConstructor(ReflectionFactory.java:<span class="hljs-number">398</span>)<br>	at sun.reflect.ReflectionFactory.newConstructorForSerialization(ReflectionFactory.java:<span class="hljs-number">360</span>)<br>	at java.io.ObjectStreamClass.getSerializableConstructor(ObjectStreamClass.java:<span class="hljs-number">1574</span>)<br>	at java.io.ObjectStreamClass.access$<span class="hljs-number">1500</span>(ObjectStreamClass.java:<span class="hljs-number">79</span>)<br>	at java.io.ObjectStreamClass$<span class="hljs-number">3.</span>run(ObjectStreamClass.java:<span class="hljs-number">519</span>)<br>	at java.io.ObjectStreamClass$<span class="hljs-number">3.</span>run(ObjectStreamClass.java:<span class="hljs-number">494</span>)<br>	at java.security.AccessController.doPrivileged(Native Method)<br>	at java.io.ObjectStreamClass.&lt;init&gt;(ObjectStreamClass.java:<span class="hljs-number">494</span>)<br>	at java.io.ObjectStreamClass.lookup(ObjectStreamClass.java:<span class="hljs-number">391</span>)<br>	at java.io.ObjectOutputStream.writeObject0(ObjectOutputStream.java:<span class="hljs-number">1134</span>)<br>	at java.io.ObjectOutputStream.defaultWriteFields(ObjectOutputStream.java:<span class="hljs-number">1548</span>)<br>	at java.io.ObjectOutputStream.writeSerialData(ObjectOutputStream.java:<span class="hljs-number">1509</span>)<br>	at java.io.ObjectOutputStream.writeOrdinaryObject(ObjectOutputStream.java:<span class="hljs-number">1432</span>)<br>	at java.io.ObjectOutputStream.writeObject0(ObjectOutputStream.java:<span class="hljs-number">1178</span>)<br>	at java.io.ObjectOutputStream.writeObject(ObjectOutputStream.java:<span class="hljs-number">348</span>)<br>	at javax.management.remote.rmi.RMIConnectorServer.encodeJRMPStub(RMIConnectorServer.java:<span class="hljs-number">727</span>)<br>	at javax.management.remote.rmi.RMIConnectorServer.encodeStub(RMIConnectorServer.java:<span class="hljs-number">719</span>)<br>	at javax.management.remote.rmi.RMIConnectorServer.encodeStubInAddress(RMIConnectorServer.java:<span class="hljs-number">690</span>)<br>	at javax.management.remote.rmi.RMIConnectorServer.start(RMIConnectorServer.java:<span class="hljs-number">439</span>)<br>	at sun.management.jmxremote.ConnectorBootstrap.startLocalConnectorServer(ConnectorBootstrap.java:<span class="hljs-number">550</span>)<br>	at sun.management.Agent.startLocalManagementAgent(Agent.java:<span class="hljs-number">137</span>)<br></code></pre></td></tr></table></figure></li>
+<li><p>直接内存溢出问题（少见） 《深入理解Java虚拟机》P59，使用Unsafe分配直接内存，或者使用NIO的问题</p>
+</li>
+<li><p>栈溢出问题 -Xss设定太小 </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">stackFullGc</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        m();<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">m</span><span class="hljs-params">()</span></span>&#123;<br>        m();<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure></li>
+<li><p>比较一下这两段程序的异同，分析哪一个是更优的写法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs java">Object o = <span class="hljs-keyword">null</span>;<br><span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>; i&lt;<span class="hljs-number">100</span>; i++) &#123;<br>    o = <span class="hljs-keyword">new</span> Object();<br>    <span class="hljs-comment">//业务处理</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>; i&lt;<span class="hljs-number">100</span>; i++) &#123;<br>    Object o = <span class="hljs-keyword">new</span> Object();<br>&#125;<br></code></pre></td></tr></table></figure></li>
+<li><p>重写finalize引发频繁GC 小米云，HBase同步系统，系统通过nginx访问超时报警，最后排查，C++程序员重写finalize引发频繁GC问题 为什么C++程序员会重写finalize？（new delete） finalize耗时比较长（200ms）c++ new 调用构造函数</p>
+<p>c++ 调用delete 默认调用析构函数</p>
+</li>
+<li><p>如果有一个系统，内存一直消耗不超过10%，但是观察GC日志，发现FGC总是频繁产生，会是什么引起的？ System.gc() (这个比较Low)</p>
+</li>
+<li><p>Distuptor有个可以设置链的长度，如果过大，然后对象大，消费完不主动释放，会溢出 (来自 死物风情)</p>
+</li>
+<li><p>用jvm都会溢出，mycat用崩过，1.6.5某个临时版本解析sql子查询算法有问题，9个exists的联合sql就导致生成几百万的对象（来自 死物风情）</p>
+</li>
+<li><p>new 大量线程，会产生 native thread OOM，（low）应该用线程池， 解决方案：减少堆空间（太TMlow了）,预留更多内存产生native thread JVM内存占物理内存比例 50% - 80%</p>
+</li>
+</ol>
+<h3 id="GC常用参数"><a href="#GC常用参数" class="headerlink" title="GC常用参数"></a>GC常用参数</h3><ul>
+<li>-Xmn -Xms -Xmx -Xss 年轻代 最小堆 最大堆 栈空间</li>
+<li>-XX:+UseTLAB 使用TLAB，默认打开</li>
+<li>-XX:+PrintTLAB 打印TLAB的使用情况</li>
+<li>-XX:TLABSize 设置TLAB大小</li>
+<li>-XX:+DisableExplictGC System.gc()不管用 ，FGC</li>
+<li>-XX:+PrintGC</li>
+<li>-XX:+PrintGCDetails</li>
+<li>-XX:+PrintHeapAtGC</li>
+<li>-XX:+PrintGCTimeStamps</li>
+<li>-XX:+PrintGCApplicationConcurrentTime (低) 打印应用程序时间</li>
+<li>-XX:+PrintGCApplicationStoppedTime （低） 打印暂停时长</li>
+<li>-XX:+PrintReferenceGC （重要性低） 记录回收了多少种不同引用类型的引用</li>
+<li>-verbose:class 类加载详细过程</li>
+<li>-XX:+PrintVMOptions</li>
+<li>-XX:+PrintFlagsFinal -XX:+PrintFlagsInitial 必须会用</li>
+<li>-Xloggc:opt/log/gc.log</li>
+<li>-XX:MaxTenuringThreshold 升代年龄，最大值15</li>
+<li>锁自旋次数 -XX:PreBlockSpin 热点代码检测参数-XX:CompileThreshold 逃逸分析 标量替换 … 这些不建议设置</li>
+</ul>
+<h3 id="Parallel常用参数"><a href="#Parallel常用参数" class="headerlink" title="Parallel常用参数"></a>Parallel常用参数</h3><ul>
+<li>-XX:SurvivorRatio</li>
+<li>-XX:PreTenureSizeThreshold 大对象到底多大</li>
+<li>-XX:MaxTenuringThreshold</li>
+<li>-XX:+ParallelGCThreads 并行收集器的线程数，同样适用于CMS，一般设为和CPU核数相同</li>
+<li>-XX:+UseAdaptiveSizePolicy 自动选择各区大小比例</li>
+</ul>
+<h3 id="CMS常用参数"><a href="#CMS常用参数" class="headerlink" title="CMS常用参数"></a>CMS常用参数</h3><ul>
+<li>-XX:+UseConcMarkSweepGC</li>
+<li>-XX:ParallelCMSThreads CMS线程数量</li>
+<li>-XX:CMSInitiatingOccupancyFraction 使用多少比例的老年代后开始CMS收集，默认是68%(近似值)，如果频繁发生SerialOld卡顿，应该调小，（频繁CMS回收）</li>
+<li>-XX:+UseCMSCompactAtFullCollection 在FGC时进行压缩</li>
+<li>-XX:CMSFullGCsBeforeCompaction 多少次FGC之后进行压缩</li>
+<li>-XX:+CMSClassUnloadingEnabled</li>
+<li>-XX:CMSInitiatingPermOccupancyFraction 达到什么比例时进行Perm回收</li>
+<li>GCTimeRatio 设置GC时间占用程序运行时间的百分比</li>
+<li>-XX:MaxGCPauseMillis 停顿时间，是一个建议时间，GC会尝试用各种手段达到这个时间，比如减小年轻代</li>
+</ul>
+<h3 id="G1常用参数"><a href="#G1常用参数" class="headerlink" title="G1常用参数"></a>G1常用参数</h3><ul>
+<li>-XX:+UseG1GC</li>
+<li>-XX:MaxGCPauseMillis 建议值，G1会尝试调整Young区的块数来达到这个值</li>
+<li>-XX:GCPauseIntervalMillis ？GC的间隔时间</li>
+<li>-XX:+G1HeapRegionSize 分区大小，建议逐渐增大该值，1 2 4 8 16 32。 随着size增加，垃圾的存活时间更长，GC间隔更长，但每次GC的时间也会更长 ZGC做了改进（动态区块大小）</li>
+<li>G1NewSizePercent 新生代最小比例，默认为5%</li>
+<li>G1MaxNewSizePercent 新生代最大比例，默认为60%</li>
+<li>GCTimeRatio GC时间建议比例，G1会根据这个值调整堆空间</li>
+<li>ConcGCThreads 线程数量</li>
+<li>InitiatingHeapOccupancyPercent 启动G1的堆空间占用比例</li>
+</ul>
 <div id="paginator"></div></div><div id="post-footer"><hr><a href="/2021/04/26/JVM/08-JVM%E5%9F%BA%E7%A1%80/">← Prev 08-JVM基础</a><span style="color: #fe2"> | </span><a href="/2021/04/24/JVM/06-JVM%E5%9F%BA%E7%A1%80/">06-JVM基础 Next →</a><hr></div><div id="bottom-btn"><a id="to-top" href="#post-title" title="to top">∧</a></div><div id="Valine"></div><script>new Valine({
  el: '#Valine'
  , appId: ''
