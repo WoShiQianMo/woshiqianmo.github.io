@@ -59,11 +59,11 @@
 </ol>
 <h5 id="二、GC日志详解"><a href="#二、GC日志详解" class="headerlink" title="二、GC日志详解"></a>二、GC日志详解</h5><p>每种垃圾回收器的日志格式是不同的！</p>
 <p>PS日志格式</p>
-<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619357691470.png" alt="GC日志详解"></p>
+<p><img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/65DE227A1F524692AF01A4FA2C5F43FE/29" alt="GC日志详解"></p>
 <p>heap dump部分：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java">eden space 5632K, <span class="hljs-number">94</span>% used [<span class="hljs-number">0x00000000ff980000</span>,<span class="hljs-number">0x00000000ffeb3e28</span>,<span class="hljs-number">0x00000000fff00000</span>)<br>                        后面的内存地址指的是，起始地址，使用空间结束地址，整体空间结束地址<br></code></pre></td></tr></table></figure>
 
-<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619357856427.png" alt="内存溢出信息"></p>
+<p><img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/7B2D42B6D4F346BFBD46CEEAD08A1C1E/25" alt="内存溢出信息"></p>
 <p>total = eden + 1个survivor</p>
 <h5 id="三、调优前的基础概念"><a href="#三、调优前的基础概念" class="headerlink" title="三、调优前的基础概念"></a>三、调优前的基础概念</h5><ol>
 <li>吞吐量：用户代码时间 /（用户代码执行时间 + 垃圾回收时间）</li>
@@ -212,22 +212,22 @@
 <li>为什么需要在线排查？ 在生产上我们经常会碰到一些不好排查的问题，例如线程安全问题，用最简单的threaddump或者heapdump不好查到问题原因。为了排查这些问题，有时我们会临时加一些日志，比如在一些关键的函数里打印出入参，然后重新打包发布，如果打了日志还是没找到问题，继续加日志，重新打包发布。对于上线流程复杂而且审核比较严的公司，从改代码到上线需要层层的流转，会大大影响问题排查的进度。 </li>
 <li>jvm观察jvm信息</li>
 </ul>
-<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619531961400.png" alt="jvm1"></p>
-<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619531990143.png" alt="jvm2"></p>
-<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619532012629.png" alt="jvm3"></p>
+<p><img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/5DD3E890D8084672872864D2610582C7/69" alt="jvm1"></p>
+<p><img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/66D314DF7BC84235B8FF9020EB033A9E/80" alt="jvm2"></p>
+<p><img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/20C0D9CF57B64D419CE9C0145BCC63FA/81" alt="jvm3"></p>
 <ul>
 <li>thread定位线程问题</li>
 </ul>
-<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619531928295.png" alt="thread"></p>
+<p><img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/744A48B1D80046D28756E43DD49770C5/72" alt="thread"></p>
 <ul>
 <li>dashboard 观察系统情况</li>
 </ul>
-<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619531875342.png" alt="dashboard"></p>
+<p><img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/21895D66D3584278A9C9BB734FF7CA4B/75" alt="dashboard"></p>
 <ul>
 <li>heapdump + jhat分析</li>
 </ul>
-<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619532151005.png" alt="heapdump"></p>
-<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619534009283.png" alt="jhat分析"></p>
+<p><img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/2E2C464B766C485A9600A12DB9157D0F/88" alt="heapdump"></p>
+<p><img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/5394899D4C0A4D21ABA2392C33F6504F/73" alt="jhat分析"></p>
 <ul>
 <li>jad反编译 动态代理生成类的问题定位 第三方的类（观察代码） 版本问题（确定自己最新提交的版本是不是被使用）</li>
 <li>redefine 热替换 目前有些限制条件：只能改方法实现（方法已经运行完成），不能改方法名， 不能改属性 m() -&gt; mm()</li>

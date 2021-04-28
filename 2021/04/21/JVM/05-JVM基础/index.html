@@ -8,8 +8,8 @@
 }</style><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
 </head><body><header><nav><a href="/">Home</a><a href="/archives/">Archives</a></nav></header><main style="flex-direction: row-reverse"><article><div id="post-bg"><div id="post-title"><h1>05-JVM基础</h1><hr></div><div id="post-content"><h5 id="一、运行时数据区-Runtime-Data-Area"><a href="#一、运行时数据区-Runtime-Data-Area" class="headerlink" title="一、运行时数据区(Runtime Data Area)"></a>一、运行时数据区(Runtime Data Area)</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TestIPulsPlus</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        <span class="hljs-keyword">int</span> i = <span class="hljs-number">8</span>;<br>        i = i++;<br>        <span class="hljs-comment">//i = ++i;</span><br>        System.out.println(i);<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
 
-<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619098339142.png" alt="a class life cycle"></p>
-<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619098596464.png" alt="Run-time data areas"></p>
+<p><img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/A18FA3C3B5234C2B9D75F898BA476E40/52" alt="a class life cycle"></p>
+<p><img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/E0FB4876CE2F45C48C70033D312BCF47/34" alt="Run-time data areas"></p>
 <h5 id="二、运行时数据区详解"><a href="#二、运行时数据区详解" class="headerlink" title="二、运行时数据区详解"></a>二、运行时数据区详解</h5><h6 id="1-PC-程序计数器"><a href="#1-PC-程序计数器" class="headerlink" title="1.PC 程序计数器"></a>1.PC 程序计数器</h6><blockquote>
 <p>存放指令位置</p>
 <p>虚拟机的运行，类似于这样的循环：</p>
@@ -24,7 +24,7 @@
 <li><p>Frame - 每个方法对应一个栈帧</p>
 <ol>
 <li><p>Local Variable Table 局部变量表</p>
-<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619099570666.png" alt="Local Variable Table"></p>
+<p><img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/149CAED5900947F89FD69DCFB4213F2C/86" alt="Local Variable Table"></p>
 </li>
 <li><p>Operand Stack  操作数栈</p>
 <p>对于long的处理（store and load），多数虚拟机的实现都是原子的 jls 17.7，没必要加volatile</p>
@@ -46,7 +46,7 @@
 <p>JVM可以直接访问的内核空间的内存 (OS 管理的内存)</p>
 <p>NIO ， 提高效率，实现zero copy</p>
 </blockquote>
-<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619099849555.png" alt="操作解析"></p>
+<p><img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/718FC972F492407695A94EC7454E7657/40" alt="操作解析"></p>
 <ul>
 <li>1.bipush 8 压栈</li>
 <li>2.istore_1 出栈放入局部变量表下标唯一的位置 int i = 8；</li>
@@ -60,16 +60,16 @@
 <ul>
 <li>hotspot的local variable table 类似于寄存器</li>
 </ul>
-<h5 id="3-栈的执行流程"><a href="#3-栈的执行流程" class="headerlink" title="3.栈的执行流程"></a>3.栈的执行流程</h5><p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619100582170.png" alt="栈的执行流程"></p>
+<h5 id="3-栈的执行流程"><a href="#3-栈的执行流程" class="headerlink" title="3.栈的执行流程"></a>3.栈的执行流程</h5><p><img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/902468326FA440BA8260EEC924EECFA5/50" alt="栈的执行流程"></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Hello</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        <span class="hljs-keyword">int</span> i = <span class="hljs-number">100</span>;<br>    &#125;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">m1</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">int</span> i = <span class="hljs-number">200</span>;<br>    &#125;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">m2</span><span class="hljs-params">(<span class="hljs-keyword">int</span> k)</span> </span>&#123;<br>        <span class="hljs-keyword">int</span> i = <span class="hljs-number">300</span>;<br>    &#125;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">add</span><span class="hljs-params">(<span class="hljs-keyword">int</span> a, <span class="hljs-keyword">int</span> b)</span> </span>&#123;<br>        <span class="hljs-keyword">int</span> c = a + b;<br>    &#125;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">m3</span><span class="hljs-params">()</span> </span>&#123;<br>        Object o = <span class="hljs-keyword">null</span>;<br>    &#125;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">m4</span><span class="hljs-params">()</span> </span>&#123;<br>        Object o = <span class="hljs-keyword">new</span> Object();<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 
 
-<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619100635276.png" alt="1619100635276"></p>
-<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619100733452.png" alt="1619100733452"></p>
-<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619100782524.png" alt="1619100782524"></p>
-<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619100871070.png" alt="1619100871070"></p>
-<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1619101284296.png" alt="1619101284296"></p>
+<p><img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/0B1C12FF338E49D69537D2B8C9191E73/44" alt="1619100635276"></p>
+<p><img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/5C9AE61D3C884E9B8136417CC05C9600/51" alt="1619100733452"></p>
+<p><img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/F1196C0A8CF942B3B78C772DB676446F/49" alt="1619100782524"></p>
+<p><img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/C9335AB1633E48D19D87302D4D9D4A23/33" alt="1619100871070"></p>
+<p><img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/12D271324F1743308E0FC01286D3E56A/54" alt="1619101284296"></p>
 <h5 id="三、Invoke常用指令"><a href="#三、Invoke常用指令" class="headerlink" title="三、Invoke常用指令"></a>三、Invoke常用指令</h5><ul>
 <li><p>store</p>
 </li>
