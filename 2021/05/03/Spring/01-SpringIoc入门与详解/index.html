@@ -1,0 +1,168 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>01-SpringIoc入门与详解 | Hexo</title><script src="https://cdn.bootcss.com/valine/1.4.4/Valine.min.js"></script><link rel="stylesheet" href="/css/arknights.css"><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/highlight.js/10.1.2/styles/atom-one-dark-reasonable.min.css"><style>@font-face {
+ font-family: BenderLight;
+ src: local('Bender'), url("/font/BenderLight.ttf");
+}
+@font-face {
+ font-family: 'JetBrains Mono';
+ src: local('JetBrains Mono'), url('/font/JetBrainsMono-Regular.woff2') format('woff2');
+}</style><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head><body><header><nav><a href="/">Home</a><a href="/archives/">Archives</a></nav></header><main style="flex-direction: row-reverse"><article><div id="post-bg"><div id="post-title"><h1>01-SpringIoc入门与详解</h1><hr></div><div id="post-content"><h4 id="Spring能做什么？"><a href="#Spring能做什么？" class="headerlink" title="Spring能做什么？"></a>Spring能做什么？</h4><p>Spring是一个轻量级的控制反转（IoC/di）和面向切面编程(AOP) 的对象容器框架</p>
+<p>Spring官网：<a target="_blank" rel="noopener" href="http://spring.io/">http://spring.io/</a> </p>
+<p>Spring 是一个于 2003 年兴起的一个轻量级的 Java 开源开发框架</p>
+<p>如今Spring已是Java项目的标配，它极大的简化了开发过程，降低了开发难度。</p>
+<ul>
+<li><p>方便解耦，简化开发；</p>
+</li>
+<li><p>AOP 编程的支持；</p>
+</li>
+<li><p>声明式事务的支持；</p>
+</li>
+<li><p>方便程序的测试；</p>
+</li>
+<li><p>方便集成各种优秀框架。</p>
+</li>
+</ul>
+<p><strong>IoC</strong></p>
+<p>Inversion of Control</p>
+<p><strong>AOP</strong> </p>
+<p>Aspect Oriented Programming </p>
+<h5 id="Spring5新特性"><a href="#Spring5新特性" class="headerlink" title="Spring5新特性"></a>Spring5新特性</h5><p>Spring5 是一个重要的版本，距离SpringFramework4差不多四年</p>
+<p><img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/697648C621B74D2B923D92396E2A3CE0/98" alt="Spring5新特性">                     </p>
+<ul>
+<li>支持JDK8<ul>
+<li>Spring 接口中的默认方法</li>
+<li>基于 Java8 反射增强的内部代码改进</li>
+<li>在框架代码中使用函数式编程 - lambda表达式 和 stream流</li>
+</ul>
+</li>
+<li>响应式编程支持Spring Web Reactive异步的、非阻塞的、事件驱动的服务</li>
+<li>支持J2EE7<ul>
+<li>Servlet 3.1</li>
+<li>JMS 2.0</li>
+<li>JPA 2.1</li>
+<li>JAX-RS 2.0</li>
+</ul>
+</li>
+<li>Bean Validation 1.1</li>
+<li>Hibernate 5</li>
+<li>Jackson 2.6</li>
+<li>EhCache 2.10</li>
+<li>JUnit 5</li>
+<li>Tiles 3</li>
+<li>Kotlin</li>
+</ul>
+<h4 id="开发环境"><a href="#开发环境" class="headerlink" title="开发环境"></a>开发环境</h4><h5 id="Spring-Jar包"><a href="#Spring-Jar包" class="headerlink" title="Spring Jar包"></a>Spring Jar包</h5><h6 id="SpringFramework官网下载地址："><a href="#SpringFramework官网下载地址：" class="headerlink" title="SpringFramework官网下载地址："></a>SpringFramework官网下载地址：</h6><p><a target="_blank" rel="noopener" href="https://repo.spring.io/libs-release-local/org/springframework/spring/">https://repo.spring.io/libs-release-local/org/springframework/spring/</a></p>
+<p>解压缩Jar包可以看见如下结构</p>
+<p><img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/60CEC59226CD477AB8AAAFA3A1A630E6/101" alt="解压缩jar包可以看到如图结构"></p>
+<ul>
+<li><p> Doc  文档 </p>
+</li>
+<li><p> Libs Jar包</p>
+</li>
+<li><p> Schema XML约束</p>
+</li>
+<li><p> license.txt 许可协议</p>
+</li>
+<li><p> notice.txt 注意事项</p>
+</li>
+<li><p> readme.txt 读我</p>
+</li>
+</ul>
+<h5 id="常用Jar包"><a href="#常用Jar包" class="headerlink" title="常用Jar包"></a>常用Jar包</h5><table>
+<thead>
+<tr>
+<th>spring-core</th>
+<th>框架的基础功能，包括IOC和AOP功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>spring-aspects</td>
+<td>提供了与AspectJ的集成，AspectJ是一个面向切面的框架，它扩展了Java语言。AspectJ定义了AOP语法，它有一个专门的编译器用来生成遵守Java字节编码规范的Class文件。</td>
+</tr>
+<tr>
+<td>spring-beans</td>
+<td>所有应用都要用到，包含访问配置文件、创建和管理 bean 以及进行 Inversion of Control(控制反转) / Dependency Injection（依赖注入）操作相关的所有类。外部依赖 spring-core</td>
+</tr>
+<tr>
+<td>spring-context</td>
+<td></td>
+</tr>
+<tr>
+<td>spring-aop、spring-instrument</td>
+<td>面向切面编程、植入代理</td>
+</tr>
+<tr>
+<td>spring-expression</td>
+<td>模块提供了强大的表达式语言去支持查询和操作运行时对象图。这是对JSP 2.1规范中规定的统一表达式语言的扩展。该语言支持设置和获取属性值，属性分配，方法调用，访问数组，集合和索引器的内容，逻辑和算术运算，变量命名以及从Spring的IoC容器中以名称检索对象。 它还支持列表投影和选择以及常见的列表聚合。</td>
+</tr>
+<tr>
+<td>spring-messaging</td>
+<td>消息传递</td>
+</tr>
+<tr>
+<td>spring-jdbc、spring-jms、spring-orm</td>
+<td>数据访问支持</td>
+</tr>
+<tr>
+<td>spring-jcl</td>
+<td>Jakarta Commons Logging采用了设计模式中的“适配器模式”，它对外提供统一的接口，然后在适配类中将对日志的操作委托给具体的日志框架。</td>
+</tr>
+<tr>
+<td>spring-tx</td>
+<td>事务</td>
+</tr>
+<tr>
+<td>spring-webmvc、spring-web</td>
+<td>Webmvc框架支持</td>
+</tr>
+<tr>
+<td>spring-webflux</td>
+<td>Servlet3.1 + Netty 方式的WebMvc</td>
+</tr>
+<tr>
+<td>spring-websocket</td>
+<td>对ws支持</td>
+</tr>
+</tbody></table>
+<h5 id="commons-logging"><a href="#commons-logging" class="headerlink" title="commons-logging"></a>commons-logging</h5><p>运行Spring程序额外还需要commons-logging包</p>
+<p><a target="_blank" rel="noopener" href="http://commons.apache.org/proper/commons-logging/download_logging.cgi">http://commons.apache.org/proper/commons-logging/download_logging.cgi</a></p>
+<h5 id="开发工具"><a href="#开发工具" class="headerlink" title="开发工具"></a>开发工具</h5><p>可以使用Eclipse、Idea等</p>
+<p>推荐使用官方开发工具STS</p>
+<p><a target="_blank" rel="noopener" href="https://spring.io/tools">https://spring.io/tools</a></p>
+<p>   <img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/035F9EC9B696437A87A50AA64A71D59A/97" alt="STS"></p>
+<h4 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h4><h5 id="window下配置"><a href="#window下配置" class="headerlink" title="window下配置"></a>window下配置</h5><ul>
+<li><p>新建-&gt;变量名”JAVA_HOME”，变量值”C:\Java\jdk1.8.0_05”（即JDK的安装路径） </p>
+</li>
+<li><p>编辑-&gt;变量名”Path”，在原变量值的最后面加上“;%JAVA_HOME%\bin;%JAVA_HOME%\jre\bin” </p>
+</li>
+<li><p>新建-&gt;变量名“CLASSPATH”,变量值“.;%JAVA_HOME%\lib;%JAVA_HOME%\lib\dt.jar;%JAVA_HOME%\lib\tools.jar”</p>
+</li>
+</ul>
+<p>在控制台分别输入java，javac，java -version 命令，测试环境是否设置成功</p>
+<h4 id="Hello-world"><a href="#Hello-world" class="headerlink" title="Hello world"></a>Hello world</h4><h5 id="新建java项目"><a href="#新建java项目" class="headerlink" title="新建java项目"></a>新建java项目</h5><h6 id="包引入"><a href="#包引入" class="headerlink" title="包引入"></a>包引入</h6><p>   <img src="https://note.youdao.com/yws/public/resource/440b71dabe81b5ef9cc60f5976a645a6/xmlnote/1BE649BCEE034374AD057A61877E593C/99" alt="核心jar包"></p>
+<h5 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h5><p>在src下新建</p>
+<p><strong>applicationContext.xml</strong></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">beans</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.springframework.org/schema/beans&quot;</span></span><br><span class="hljs-tag"><span class="hljs-attr">xmlns:xsi</span>=<span class="hljs-string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span><br><span class="hljs-tag"><span class="hljs-attr">xmlns:p</span>=<span class="hljs-string">&quot;http://www.springframework.org/schema/p&quot;</span> </span><br><span class="hljs-tag"><span class="hljs-attr">xmlns:mvc</span>=<span class="hljs-string">&quot;http://www.springframework.org/schema/mvc&quot;</span></span><br><span class="hljs-tag"><span class="hljs-attr">xmlns:context</span>=<span class="hljs-string">&quot;http://www.springframework.org/schema/context&quot;</span></span><br><span class="hljs-tag"><span class="hljs-attr">xsi:schemaLocation</span>=<span class="hljs-string">&quot;http://www.springframework.org/schema/beans</span></span><br><span class="hljs-tag"><span class="hljs-string">http://www.springframework.org/schema/beans/spring-beans.xsd</span></span><br><span class="hljs-tag"><span class="hljs-string">http://www.springframework.org/schema/mvc</span></span><br><span class="hljs-tag"><span class="hljs-string">http://www.springframework.org/schema/mvc/spring-mvc.xsd</span></span><br><span class="hljs-tag"><span class="hljs-string">http://www.springframework.org/schema/context</span></span><br><span class="hljs-tag"><span class="hljs-string">http://www.springframework.org/schema/context/spring-context.xsd&quot;</span>&gt;</span>        <br>        &quot;src/applicationContext.xml&quot;<br>        <span class="hljs-tag">&lt;<span class="hljs-name">bean</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;user&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;com.baize.User&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">bean</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">beans</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<h6 id="Bean"><a href="#Bean" class="headerlink" title="Bean"></a>Bean</h6><p>建立准备由Spring管理的Bean</p>
+<p>包含两个属性，生成get/set方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs plain">private String name;<br>private Integer age;<br></code></pre></td></tr></table></figure>
+
+<h6 id="测试类"><a href="#测试类" class="headerlink" title="测试类"></a>测试类</h6><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs java">ApplicationContext ctx = <span class="hljs-keyword">new</span> ClassPathXmlApplicationContext(<span class="hljs-string">&quot;applicationContext.xml&quot;</span>);<br>		User user = (User)ctx.getBean(<span class="hljs-string">&quot;user&quot;</span>);<br>		user.setName(<span class="hljs-string">&quot;uu&quot;</span>);<br>		user.setAge(<span class="hljs-number">18</span>);<br>		System.out.println(ToStringBuilder.reflectionToString(user));<br> <br></code></pre></td></tr></table></figure>
+
+<h5 id="ToStringBuilder-工具类"><a href="#ToStringBuilder-工具类" class="headerlink" title="ToStringBuilder 工具类"></a>ToStringBuilder 工具类</h5><ul>
+<li><p>Commons项目中用来处理Java基本对象方法的工具类包，可以简化很多平时经常要用到的写法，例如判断字符串是否为空等等。</p>
+</li>
+<li><p>是一个最常用的工具，作为jdk的补充。</p>
+</li>
+<li><p>Lang下有很多Utils类，提供了若干static方法供调用，涵盖了字符串操作、字符操作、JVM交互操作、归类、异常和位域校验等等。</p>
+</li>
+</ul>
+<p>项目地址</p>
+<p><a target="_blank" rel="noopener" href="http://commons.apache.org/proper/commons-lang/download_lang.cgi">http://commons.apache.org/proper/commons-lang/download_lang.cgi</a></p>
+<div id="paginator"></div></div><div id="post-footer"><hr><a href="/2021/05/03/Spring/02-Maven%E6%9E%84%E5%BB%BASpringAOP/">← Prev 02-Maven构建SpringAOP</a><span style="color: #fe2"> | </span><a href="/2021/05/03/MySQL%E8%B0%83%E4%BC%98/01-MySQL%E8%B0%83%E4%BC%98/">01-MySQL调优 Next →</a><hr></div><div id="bottom-btn"><a id="to-top" href="#post-title" title="to top">∧</a></div><div id="Valine"></div><script>new Valine({
+ el: '#Valine'
+ , appId: ''
+ , appKey: ''
+ , placeholder: '此条评论委托企鹅物流发送'
+})</script></div></article><aside><div id="about"><a href="/" id="logo"><img src="https://scpic.chinaz.net/files/pic/pic9/202104/apic31860.jpg" alt="Logo"></a><h1 id="Dr"><a href="/"> Dr.浅陌</a></h1><section id="total"><a id="total-archives" href="/archives"><span class="total-title">Archives Total:</span><span class="total-number">25</span></a><div id="total-tags"><span class="total-title">Tags:</span><span class="total-number">6</span></div><div id="total-categories"><span class="total-title">Categories:</span><span class="total-number">6</span></div></section></div><div id="aside-block" style="order: -1"></div><footer style="text-align: right"><wbr></footer></aside></main><canvas id="canvas-dust"></canvas><script src="/js/arknights.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/10.1.2/highlight.min.js"></script></body></html>

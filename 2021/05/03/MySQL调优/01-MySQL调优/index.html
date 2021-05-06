@@ -1,0 +1,49 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>01-MySQL调优 | Hexo</title><script src="https://cdn.bootcss.com/valine/1.4.4/Valine.min.js"></script><link rel="stylesheet" href="/css/arknights.css"><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/highlight.js/10.1.2/styles/atom-one-dark-reasonable.min.css"><style>@font-face {
+ font-family: BenderLight;
+ src: local('Bender'), url("/font/BenderLight.ttf");
+}
+@font-face {
+ font-family: 'JetBrains Mono';
+ src: local('JetBrains Mono'), url('/font/JetBrainsMono-Regular.woff2') format('woff2');
+}</style><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head><body><header><nav><a href="/">Home</a><a href="/archives/">Archives</a></nav></header><main style="flex-direction: row-reverse"><article><div id="post-bg"><div id="post-title"><h1>01-MySQL调优</h1><hr></div><div id="post-content"><h5 id="零、MySQL架构"><a href="#零、MySQL架构" class="headerlink" title="零、MySQL架构"></a>零、MySQL架构</h5><p>client –&gt; server（解析器–&gt;AST抽象语法树–&gt;优化器【RBO基于规则优化、CBO基于成本优化】–&gt;执行器） –&gt; 引擎 </p>
+<p>8.0之前–&gt;server包括查询缓存，8.0后移除，缓存命中率低</p>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1620023384185.png" alt="1620023384185"></p>
+<h5 id="一、性能监控"><a href="#一、性能监控" class="headerlink" title="一、性能监控"></a>一、性能监控</h5><ul>
+<li><p>使用show profile查询解析工具，可以指定具体的type（8.0之前）</p>
+<ul>
+<li>all 显示所有性能信息     show profile all for query n</li>
+<li>block io 显示块io操作的次数 show profile block io for query n</li>
+<li>context switches 显示上下文切换次数，被动和主动 show profile context swtiches for query n</li>
+<li>cpu 显示用户cpu时间、系统cpu时间 show profile cpu for query n</li>
+<li>IPC 显示发送和接受的消息数量 show profile ipc for query n</li>
+<li>Memory 暂未实现</li>
+<li>page faults 显示页错误数量 show profile page faults for query n</li>
+<li>source 显示源码中的函数名称与位置 show profile source for query n</li>
+<li>swaps 显示swap的次数 show profile swaps for query n</li>
+</ul>
+</li>
+<li><p>使用performance schema来更加容易监控mysql</p>
+<p>set performance_schema = on; 默认设置开启</p>
+<p>/etc/var/my.cnf 修改关闭</p>
+<p>- </p>
+</li>
+<li><p>使用show processlist查看连接的线程个数，来观察是否有大量线程处于不正常的状态或者其他不正常的特征</p>
+<ul>
+<li>id 表示session id</li>
+<li>user 表示操作的用户</li>
+<li>host 表示操作的主机 </li>
+<li>db 表示操作的数据库</li>
+<li>common 表示命令类型</li>
+<li>info 表示详细的sql语句</li>
+<li>time 表示相应命令执行的时间</li>
+<li>state 表示命令执行状态</li>
+</ul>
+</li>
+</ul>
+<h5 id="二、schema-与-数据库类型优化"><a href="#二、schema-与-数据库类型优化" class="headerlink" title="二、schema 与 数据库类型优化"></a>二、schema 与 数据库类型优化</h5><h5 id="三、执行计划"><a href="#三、执行计划" class="headerlink" title="三、执行计划"></a>三、执行计划</h5><h5 id="四、通过索引进行优化"><a href="#四、通过索引进行优化" class="headerlink" title="四、通过索引进行优化"></a>四、通过索引进行优化</h5><div id="paginator"></div></div><div id="post-footer"><hr><a href="/2021/05/03/Spring/01-SpringIoc%E5%85%A5%E9%97%A8%E4%B8%8E%E8%AF%A6%E8%A7%A3/">← Prev 01-SpringIoc入门与详解</a><span style="color: #fe2"> | </span><a href="/2021/05/02/JVM/09-JVM%E5%9F%BA%E7%A1%80/">09-JVM基础 Next →</a><hr></div><div id="bottom-btn"><a id="to-top" href="#post-title" title="to top">∧</a></div><div id="Valine"></div><script>new Valine({
+ el: '#Valine'
+ , appId: ''
+ , appKey: ''
+ , placeholder: '此条评论委托企鹅物流发送'
+})</script></div></article><aside><div id="about"><a href="/" id="logo"><img src="https://scpic.chinaz.net/files/pic/pic9/202104/apic31860.jpg" alt="Logo"></a><h1 id="Dr"><a href="/"> Dr.浅陌</a></h1><section id="total"><a id="total-archives" href="/archives"><span class="total-title">Archives Total:</span><span class="total-number">25</span></a><div id="total-tags"><span class="total-title">Tags:</span><span class="total-number">6</span></div><div id="total-categories"><span class="total-title">Categories:</span><span class="total-number">6</span></div></section></div><div id="aside-block" style="order: -1"></div><footer style="text-align: right"><wbr></footer></aside></main><canvas id="canvas-dust"></canvas><script src="/js/arknights.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/10.1.2/highlight.min.js"></script></body></html>
