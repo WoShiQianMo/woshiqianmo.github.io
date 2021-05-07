@@ -1,0 +1,92 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>1.Spring相关面试题 | Hexo</title><script src="https://cdn.bootcss.com/valine/1.4.4/Valine.min.js"></script><link rel="stylesheet" href="/css/arknights.css"><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/highlight.js/10.1.2/styles/atom-one-dark-reasonable.min.css"><style>@font-face {
+ font-family: BenderLight;
+ src: local('Bender'), url("/font/BenderLight.ttf");
+}
+@font-face {
+ font-family: 'JetBrains Mono';
+ src: local('JetBrains Mono'), url('/font/JetBrainsMono-Regular.woff2') format('woff2');
+}</style><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head><body><header><nav><a href="/">Home</a><a href="/archives/">Archives</a></nav></header><main style="flex-direction: row-reverse"><article><div id="post-bg"><div id="post-title"><h1>1.Spring相关面试题</h1><hr></div><div id="post-content"><h5 id="1-谈谈Spring-IOC的理解原理与实现？"><a href="#1-谈谈Spring-IOC的理解原理与实现？" class="headerlink" title="1.谈谈Spring IOC的理解原理与实现？"></a>1.谈谈Spring IOC的理解原理与实现？</h5><p><strong>总：</strong></p>
+<ul>
+<li><p>控制反转：理论思想，原来的对象是由使用者控制，有了spring之后，可以把整个对象交给Spring来帮我们进行管理</p>
+<p>DI：依赖注入，把对应的属性的值注入到具体的对象中，@Autowired，populateBean完成属性值的注入</p>
+</li>
+<li><p>容器：存储对象，使用map结构来存储，在Spring中一般存在三级缓存，singletonObject存放完整的bean对象，</p>
+<p>整个bean的生命周期，从创建到使用到销毁的过程全部都是由容器来管理（bean的生命周期）</p>
+</li>
+</ul>
+<p><strong>分：</strong></p>
+<p>1、一般聊ioc容器的时候要涉及到容器的创建过程(beanFactory,DefaultListableBeanFactory),向bean工程中设置一些参数（BeanPostProcessor，Aware接口的子类）等等属性</p>
+<p>2、加载解析bean对象，准备要创建的bean对象的定义对象beanDefinition,(xml或者注解的解析过程)</p>
+<p>3、beanFactoryPostProcessor的处理，此处是扩展点，PlaceHolderConfigurSupport，ConfigurationClassPostProcessor</p>
+<p>4、BeanPostProcessor的注册功能，方便后续对bean对象完成具体的扩展功能</p>
+<p>5、通过反射的方式将BeanDefinition对象实例化成具体的bean对象</p>
+<p>6、bean对象的初始化过程（填充属性、调用aware子类的方法，调用BeanPostProcessor前置处理方法，调用init-method方法，调用BeanPostProcessor的后置处理方法）</p>
+<p>7、生成完整的bean对象，通过getBean方法可以直接获取</p>
+<p>8、销毁过程</p>
+<p>面试官，这是我对ioc的整体理解，包含了一些详细的处理过程，您看一下有什么问题，可以指点一下（允许你把整个流程说完）</p>
+<p>如果不会：具体的细节我记不清了，但是，spring中的bean都是通过反射的方式生成的，同时其中包含了很多的扩展点，比如最常用的对BeanFactory的扩展，对bean的扩展（对占位符的处理），我们在公司对这方面的使用是比较多的，除此之外，ioc中最核心的也就是填充具体bean的属性，和生命周期</p>
+<h5 id="2-谈一下Spring-IOC的底层实现？"><a href="#2-谈一下Spring-IOC的底层实现？" class="headerlink" title="2.谈一下Spring IOC的底层实现？"></a>2.谈一下Spring IOC的底层实现？</h5><p>createBeanFactory,getBean,doGetBean,createBean,doCreateBean,createBeanInstance(getDeclaredConstructor,newInstance),populateBean,initializingBean</p>
+<p>1、先通过createBeanFactory创建出一个Bean工厂（DefaultListableBeanFactory）</p>
+<p>2、开始循环创建对象，因为容器中的bean默认都是单例的，所以优先通过getBean，doGetBean从容器中查找，找不到的话</p>
+<p>3、通过createBean，doCreateBean方法，以反射的方式创建对象，一般情况下使用的是无参的构造方法（getDeclaredConstructor，newInstance）</p>
+<p>4、进行对象的属性填充populateBean</p>
+<p>5、进行其他的初始化操作（initializingBean）</p>
+<h5 id="3-描述一下bean的生命周期"><a href="#3-描述一下bean的生命周期" class="headerlink" title="3.描述一下bean的生命周期?"></a>3.描述一下bean的生命周期?</h5><p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1620317634286.png" alt="bean生命周期"></p>
+<p>1、实例化bean：反射的方式生成对象</p>
+<p>2、填充bean的属性：populateBean()，循环依赖的问题（三级缓存）</p>
+<p>3、调用aware接口相关的方法：invokeAwareMethod(完成BeanName，BeanFactory，BeanClassLoader对象的属性设置)</p>
+<p>4、调用BeanPostProcessor中前置处理方法：使用比较多的有（ApplicationContextPostProcessor，设置ApplicationContext，Environment，ResourceLoader，EmbeddValueResolver等对象）</p>
+<p>5、调用initmethod方法：invokeInitmethod()，判断是否实现了initiaizingBean接口，如果有，调用afterPropertiesSet方法，没有就不调用</p>
+<p>6、调用BeanPostProcessor的后置处理方法：Spring的Aop就是在此处实现的，AbstractAutoProxyCreator注册Destuction相关的回调接口（钩子函数）</p>
+<p>7、获取到完整的对象，可以通过getBean的方式来进行对象的获取</p>
+<p>8、销毁流程：1：判断是否实现了DispoableBean接口，2：调用destroyMethod方法</p>
+<h5 id="4-Spring是如何解决循环依赖的问题？"><a href="#4-Spring是如何解决循环依赖的问题？" class="headerlink" title="4.Spring是如何解决循环依赖的问题？"></a>4.Spring是如何解决循环依赖的问题？</h5><p>三级缓存，提前暴露对象，aop</p>
+<p>总：什么是循环依赖问题，A依赖B，B依赖A</p>
+<p>分：先说明bean的创建过程：实例化，初始化（填充属性）</p>
+<p><img src="C:\Users\QianMo\AppData\Roaming\Typora\typora-user-images\1620395385331.png" alt="循环依赖过程"></p>
+<p>​    1、先创建A对象，实例化A对象，此时A对象中的B属性为空，填充属性B</p>
+<p>​    2、从容器中B对象，如果找到了，直接复制不存在循环依赖问题（不通），找不到直接创建B对象</p>
+<p>​    3、实例化B对象，此时B对象中的A属性为空，填充属性A</p>
+<p>​    4、从容器中查找A对象，找不到，直接创建</p>
+<p>​    形成闭环的原因</p>
+<p>​    此时，如果仔细琢磨的话，会发现A对象是存在的，只不过此时的A对象不是一个完整的状态，只完成了实例化但是未完成初始化，如果在程序调用过程中，拥有了某个对象的引用，能否在后期给他完成复制操作，可以优先把非完整状态的对象优先赋值，等待后续操作来完成赋值，相当于提前暴露了某个对象的引用，所以解决问题的核心在于实例化和初始化分开操作，这也是解决循环依赖问题的关键，</p>
+<p>​    当所有的对象都完成实例化和初始化操作之后，还要把完整对象放到容器中，此时在容器中存在对象的几个状态，完成实例化，但未完成初始化，完整状态，因为都在容器中，所以要使用不同的map结构来进行存储，此时就有了一级缓存和二级缓存，如果一级缓存中有了，二级缓存中就不会存在同名的对象，因为他们赋值的查找顺序是1，2，3这样方式来查找的。一级缓存中放的是完整对象，二级缓存中放的是非完整对象</p>
+<p>​    为什么需要三级缓存？三级缓存的value类型是ObjectFactory，是一个函数式接口，存在的意义是保证在整个容器的运行过程中同名的bean对象只能有一个</p>
+<p>​    如果一个Bean对象需要被代理，或者说需要生成代理对象，那么要不要优先生成一个普通对象？要</p>
+<p>​    普通对象和代理对象是不能同时出现在容器中的，因此当一个对象需要被代理的时候，就要使用代理对象覆盖掉之前的普通对象，在实际调用过程中，是没有办法确定什么时候对象被使用，所以就要求当某个对象被调用的时候，优先判断此对象是否需要被代理，类似于一种回调机制的实现，因此传入lambda表达式的时候，可以通过lambda表达式来执行对象的覆盖过程，getEarlyBeanReference()</p>
+<p>​    因此，所有的bean对象在创建的时候都要优先放到三级缓存中，在后续的使用过程中，如果需要代理则返回代理对象，如果不需要被代理，则直接返回普通对象</p>
+<h5 id="5-缓存的放置时间和删除时间"><a href="#5-缓存的放置时间和删除时间" class="headerlink" title="5.缓存的放置时间和删除时间"></a>5.缓存的放置时间和删除时间</h5><p>三级缓存：createBeanInstance之后，addSingletonFactory</p>
+<p>二级缓存：第一次从三级缓存确认代理对象还是普通对象的时候，同时删除三级缓存，getSingleton</p>
+<p>一级缓存：生成完整对象之后，放到一级缓存，删除二三级缓存，addSingleton</p>
+<h5 id="6-BeanFactory与FactoryBean有什么区别？"><a href="#6-BeanFactory与FactoryBean有什么区别？" class="headerlink" title="6.BeanFactory与FactoryBean有什么区别？"></a>6.BeanFactory与FactoryBean有什么区别？</h5><p>相同点：都是用来创建Bean对象的</p>
+<p>不同点：使用BeanFactory创建对象的时候，必须要遵循严格的生命周期流程，太复杂了，如果想要简单的自定义某个对象的创建，同时创建完成的对象交给Spring来管理，那么就要实现FactoryBean接口了</p>
+<p>​    isSingleton：是否是单例对象</p>
+<p>​    getObjectType：获取返回对象的类型</p>
+<p>​    getObject：自定义创建对象的过程（new，反射，动态代理）</p>
+<h5 id="7-Spring中用到的设计模式？"><a href="#7-Spring中用到的设计模式？" class="headerlink" title="7.Spring中用到的设计模式？"></a>7.Spring中用到的设计模式？</h5><p>单例模式：bean默认都是单例的</p>
+<p>原型模式：指定作用域为prototype</p>
+<p>工厂模式：BeanFactory</p>
+<p>模板方法：postProcessBeanFactory，onRefresh，initPropertyValue</p>
+<p>策略模式：XmlBeanDefinitionReader，PropertiesBeanDefinitionReader</p>
+<p>观察者模式：listener，event，multicast</p>
+<p>适配器模式：Adapter</p>
+<p>装饰者模式：BeanWrapper</p>
+<p>责任链模式：使用aop的时候会先生成一个拦截器链</p>
+<p>代理模式：动态代理</p>
+<p>委托者模式：delegate</p>
+<p>…..</p>
+<h5 id="8、Spring的AOP的底层实现原理？"><a href="#8、Spring的AOP的底层实现原理？" class="headerlink" title="8、Spring的AOP的底层实现原理？"></a>8、Spring的AOP的底层实现原理？</h5><p>aop是ioc的一个扩展功能，先有的ioc，再有的aop，只是ioc的整个流程中新增的一个扩展点而已：BeanPostProcesor</p>
+<p>​    总：aop概念，应用场景，动态代理</p>
+<p>​    分：bean的创建过程中有一个步骤可以对bean进行扩展实现，aop本身就是一个扩展功能，所以在BeanPostProcessor的后置处理方法中进行实现</p>
+<p>​    1、代理对象的创建过程（advice，切面，切点）</p>
+<p>​    2、通过jdk或者cglib的方式来生成代理对象</p>
+<p>​    3、在执行方法调用的时候，会调用到生成的字节码文件中，直接会找到DynamicAdvisoredInterceptor类中的intercept方法，从此方法开始执行</p>
+<p>​    4、根据之前定义好的通知来生成拦截器链</p>
+<p>​    5、从拦截器链中依次获取每一个通知开始进行执行，在执行过程中，为了方便找到下一个通知是哪个，会有一个InvocationInterceptor的对象，找的时候是从-1的位置依次开始查找并且执行的</p>
+<h5 id="9、Spring的事务是如何回滚的？"><a href="#9、Spring的事务是如何回滚的？" class="headerlink" title="9、Spring的事务是如何回滚的？"></a>9、Spring的事务是如何回滚的？</h5><h5 id="10、谈一下Spring事务传播？"><a href="#10、谈一下Spring事务传播？" class="headerlink" title="10、谈一下Spring事务传播？"></a>10、谈一下Spring事务传播？</h5><div id="paginator"></div></div><div id="post-footer"><hr><a href="/2021/05/07/%E5%AF%B9%E5%A4%96%E6%8E%A5%E5%8F%A3/%E5%AF%B9%E5%A4%96%E6%8E%A5%E5%8F%A3/">← Prev 对外接口</a><span style="color: #fe2"> | </span><a href="/2021/05/03/Spring/03-Spring%E4%B8%AD%E7%9A%84%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E4%B8%8E%E4%BB%A3%E7%90%86%E6%96%B9%E5%BC%8F%E8%AE%B2%E8%A7%A3/">03-Spring中的循环依赖与代理方式讲解 Next →</a><hr></div><div id="bottom-btn"><a id="to-top" href="#post-title" title="to top">∧</a></div><div id="Valine"></div><script>new Valine({
+ el: '#Valine'
+ , appId: ''
+ , appKey: ''
+ , placeholder: '此条评论委托企鹅物流发送'
+})</script></div></article><aside><div id="about"><a href="/" id="logo"><img src="https://scpic.chinaz.net/files/pic/pic9/202104/apic31860.jpg" alt="Logo"></a><h1 id="Dr"><a href="/"> Dr.浅陌</a></h1><section id="total"><a id="total-archives" href="/archives"><span class="total-title">Archives Total:</span><span class="total-number">27</span></a><div id="total-tags"><span class="total-title">Tags:</span><span class="total-number">7</span></div><div id="total-categories"><span class="total-title">Categories:</span><span class="total-number">7</span></div></section></div><div id="aside-block" style="order: -1"></div><footer style="text-align: right"><wbr></footer></aside></main><canvas id="canvas-dust"></canvas><script src="/js/arknights.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/10.1.2/highlight.min.js"></script></body></html>
