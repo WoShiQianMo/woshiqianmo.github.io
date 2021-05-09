@@ -84,9 +84,33 @@
 <p>​    3、在执行方法调用的时候，会调用到生成的字节码文件中，直接会找到DynamicAdvisoredInterceptor类中的intercept方法，从此方法开始执行</p>
 <p>​    4、根据之前定义好的通知来生成拦截器链</p>
 <p>​    5、从拦截器链中依次获取每一个通知开始进行执行，在执行过程中，为了方便找到下一个通知是哪个，会有一个InvocationInterceptor的对象，找的时候是从-1的位置依次开始查找并且执行的</p>
-<h5 id="9、Spring的事务是如何回滚的？"><a href="#9、Spring的事务是如何回滚的？" class="headerlink" title="9、Spring的事务是如何回滚的？"></a>9、Spring的事务是如何回滚的？</h5><h5 id="10、谈一下Spring事务传播？"><a href="#10、谈一下Spring事务传播？" class="headerlink" title="10、谈一下Spring事务传播？"></a>10、谈一下Spring事务传播？</h5><div id="paginator"></div></div><div id="post-footer"><hr><a href="/2021/05/07/%E5%AF%B9%E5%A4%96%E6%8E%A5%E5%8F%A3/%E5%AF%B9%E5%A4%96%E6%8E%A5%E5%8F%A3/">← Prev 对外接口</a><span style="color: #fe2"> | </span><a href="/2021/05/03/Spring/03-Spring%E4%B8%AD%E7%9A%84%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E4%B8%8E%E4%BB%A3%E7%90%86%E6%96%B9%E5%BC%8F%E8%AE%B2%E8%A7%A3/">03-Spring中的循环依赖与代理方式讲解 Next →</a><hr></div><div id="bottom-btn"><a id="to-top" href="#post-title" title="to top">∧</a></div><div id="Valine"></div><script>new Valine({
+<h5 id="9、Spring的事务是如何回滚的？"><a href="#9、Spring的事务是如何回滚的？" class="headerlink" title="9、Spring的事务是如何回滚的？"></a>9、Spring的事务是如何回滚的？</h5><p>Spring的事务管理是如何实现的？</p>
+<p>​    总：Spring的事务是由aop来实现的，首先要生成具体的代理对象，然后按照aop的整套流程来执行具体的操作逻辑，正常情况下要通过通知来完成核心功能，但是事务不是通过通知来实现的，而是通过一个TransactionInterceptor来实现的，然后调用Invoke来实现具体的逻辑</p>
+<p>​    分：1、先做准备工作，解析各个方法上事务相关的属性，根据具体的属性来判断是否开启新事务</p>
+<p>​            2、当需要开启的时候，获取数据库连接，关闭自动提交功能，开启事务</p>
+<p>​            3、执行具体的SQL逻辑操作</p>
+<p>​            4、在操作过程中，如果执行失败了，那么会通过completeTransactionAfterThrowing看来完成事务的回滚操作，回滚的具体逻辑是通过doRollBack方法来实现的，实现的时候也是要先获取连接对象，通过连接对象来回滚</p>
+<p>​            5、如果执行过程中，没有任何意外情况的发生，那么通过commitTransactionAfterReturning来完成事务的提交操作，提交的具体逻辑是通过doCommit方法来实现的，实现的时候也是要获取连接，通过连接对象来提交</p>
+<p>​            6、当事务执行完毕之后需要清除相关的事务信息cleanupTransactionInfo</p>
+<p>如果想要聊的更细致的化，需要知道TransactionInfo，TransactionStatus</p>
+<h5 id="10、谈一下Spring事务传播？"><a href="#10、谈一下Spring事务传播？" class="headerlink" title="10、谈一下Spring事务传播？"></a>10、谈一下Spring事务传播？</h5><p>传播特性有几种？7种</p>
+<p>Required，Requires_new，nested，Support，Not_Support,Never，Mandatory</p>
+<p>某一个事务嵌套另一个事务的时候怎么办？</p>
+<p>A方法调用b方法，AB方法都有事务，并且传播性质不同，那么A如果有异常，B怎么办，B如果有异常，A怎么办？</p>
+<p>总：事务的传播特性指的是不同的方法的嵌套调用过程中，事务应该如何进行处理，是用同一个事务还是不同的事务，当出现异常的时候会回滚还是提交，两个方法之间的相关影响，在日常工作中，使用比较多的是required，Requires_new，nested</p>
+<p>分：1、先说事务的不同分类，可以分为三类：支持当前事务，不支持当前事务，嵌套事务</p>
+<p>​        2、如果外层方法是required，内层方法是，required，requires_new，nested</p>
+<p>​        3、如果外层方法是requires_new，内层方法是，required，requires_new，nested</p>
+<p>​        4、如果外层方法是nested，内层方法是，required，requires_new，nested</p>
+<p>核心处理逻辑非常简单：</p>
+<p>​    1、判断内外方法是否是同一个事务</p>
+<pre><code>    - 是：异常统一在外层方法处理
+    - 不是：内层方法有可能影响到外层方法，但是外层方法是不会影响到内层方法的
+</code></pre>
+<p>大致可以这么理解（但是nested不同）</p>
+<div id="paginator"></div></div><div id="post-footer"><hr><a href="/2021/05/08/%E5%B7%A5%E4%BD%9C%E6%80%BB%E7%BB%93/">← Prev 工作总结</a><span style="color: #fe2"> | </span><a href="/2021/05/03/Spring/03-Spring%E4%B8%AD%E7%9A%84%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E4%B8%8E%E4%BB%A3%E7%90%86%E6%96%B9%E5%BC%8F%E8%AE%B2%E8%A7%A3/">03-Spring中的循环依赖与代理方式讲解 Next →</a><hr></div><div id="bottom-btn"><a id="to-top" href="#post-title" title="to top">∧</a></div><div id="Valine"></div><script>new Valine({
  el: '#Valine'
  , appId: ''
  , appKey: ''
  , placeholder: '此条评论委托企鹅物流发送'
-})</script></div></article><aside><div id="about"><a href="/" id="logo"><img src="https://scpic.chinaz.net/files/pic/pic9/202104/apic31860.jpg" alt="Logo"></a><h1 id="Dr"><a href="/"> Dr.浅陌</a></h1><section id="total"><a id="total-archives" href="/archives"><span class="total-title">Archives Total:</span><span class="total-number">27</span></a><div id="total-tags"><span class="total-title">Tags:</span><span class="total-number">7</span></div><div id="total-categories"><span class="total-title">Categories:</span><span class="total-number">7</span></div></section></div><div id="aside-block" style="order: -1"></div><footer style="text-align: right"><wbr></footer></aside></main><canvas id="canvas-dust"></canvas><script src="/js/arknights.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/10.1.2/highlight.min.js"></script></body></html>
+})</script></div></article><aside><div id="about"><a href="/" id="logo"><img src="https://scpic.chinaz.net/files/pic/pic9/202104/apic31860.jpg" alt="Logo"></a><h1 id="Dr"><a href="/"> Dr.浅陌</a></h1><section id="total"><a id="total-archives" href="/archives"><span class="total-title">Archives Total:</span><span class="total-number">27</span></a><div id="total-tags"><span class="total-title">Tags:</span><span class="total-number">8</span></div><div id="total-categories"><span class="total-title">Categories:</span><span class="total-number">8</span></div></section></div><div id="aside-block" style="order: -1"></div><footer style="text-align: right"><wbr></footer></aside></main><canvas id="canvas-dust"></canvas><script src="/js/arknights.js"></script><script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/10.1.2/highlight.min.js"></script></body></html>
